@@ -1,0 +1,102 @@
+# Architecture
+
+The design rationale, grounded in established software-engineering practice. If
+`README.md` is *what it does*, this is *why it's shaped this way*.
+
+## What "great" means here
+
+Not a vague aspiration — six concrete properties, each bought by one named practice:
+
+| Property | Bought by | How it shows up |
+|---|---|---|
+| **Adoptable** out of the box | Convention over Configuration | `init.sh` detects harnesses, scaffolds `config/`, applies. Zero-config common case. |
+| **Extensible** to new harnesses | Open/Closed + Adapter + Registry | A new harness is a new module + one registry line. No edits to existing code. |
+| **Agnostic / portable** | Dependency Inversion + env-as-config | Policy depends on a neutral schema, not on any one LLM/tool. No hardcoded paths (`$HOME`, OS-aware dirs). |
+| **Verifiable** | Declarative reconcile + drift check + tests | `apply` converges; `verify` reports drift; the suite runs in a sandbox. |
+| **Lean / token-efficient** | DRY single-source + the determinism protocol | One definition → N renderings (no duplication). Scripts over re-derivation. |
+| **Comprehensible** | Separation of mechanism from policy | `core/` (engine) vs `config/` (yours) is visible in the tree. |
+
+## The spine: mechanism / policy separation
+
+The one move that makes this open-sourceable. The engine (`core/`) holds *no* personal
+data — no paths, no specific skills, no specific servers. Your choices live in `config/`
+(git-ignored; `config.example/` is the tracked template). Anyone clones the engine and
+brings their own policy. Everything else below is downstream of this cut.
+
+## Patterns applied (and where they earn their place)
+
+- **Adapter + Registry (Open/Closed).** Each harness implements a tiny interface
+  (`capabilities()`, `apply(ctx)`). `ADAPTERS` is a plain dict. Four real
+  implementations justify the abstraction; there is deliberately **no** plugin-discovery
+  DSL or dynamic loader — that would be speculative for four in-repo adapters.
+- **Reconciliation loop (declarative IaC, à la Terraform/Ansible).** Adapters describe
+  desired state; `util.py` converges a file to it (`apply`) or diffs it (`verify`).
+  Every helper is idempotent, so re-running is a no-op and `verify` right after `apply`
+  is clean. Drift for shared files (e.g. `settings.json`) is defined as *"would our
+  managed keys change?"* — computed by running the same idempotent mutation on a copy —
+  so a user's unrelated edits never read as drift.
+- **Dependency Inversion via a *thin* IR.** The canonical config is the abstraction both
+  sides depend on. It's intentionally thin: only **MCP** and **enforcement wiring**
+  genuinely diverge per harness and get adapter treatment. Instructions are plain
+  markdown (symlink/inline) and skills are the open Agent Skills standard (linking +
+  tiers) — wrapping those in a schema would be abstraction for its own sake.
+- **Capability detection over version-sniffing.** `capabilities()` lets the reconciler
+  degrade gracefully (VS Code: no MCP/skill surface) instead of failing. This is the
+  honest path to "harness-agnostic."
+- **Convention over Configuration.** Standard verb names; `init` infers the rest.
+- **Facade.** `make` (or `python3 -m core.agentsync`) is the single front door.
+
+## The determinism protocol as the reference plugin
+
+The protocol isn't bolted on — it's the flagship demonstration of the extension model:
+"an enforcement capability each adapter renders." It also proves the adapter interface is
+real (each harness wires a session nudge + a commit gate its own way).
+
+Key portability choice: the **verb set is the standard; the task runner is a binding.**
+`_runner.sh` detects mise/make/just/npm behind one interface, so the protocol is neither
+harness-locked nor runner-locked. The principle itself is the established norm
+(Anthropic's *Building Effective Agents*: workflows over agents; 12-Factor Agents:
+own your control flow; Agent Skills: prefer scripts for deterministic ops).
+
+### Enforcement is layered, and honest about its limits
+
+| Layer | Mechanism | Guarantees |
+|---|---|---|
+| Rule | `instructions.md`, synced everywhere | the agent is always *told* |
+| Nudge | SessionStart / userPromptSubmitted hook | the agent always *sees* the repo's front door (or to scaffold) |
+| Adoption | `scaffold-determinism` | any repo joins the standard in one command |
+| Gate | PreToolUse commit hook → `verify`, exit 2 | no agent commit lands on a failing `verify` (fails open otherwise) |
+
+What stays probabilistic, stated plainly: **the agent *choosing* to extract a
+deterministic path in the first place.** No hook reads that intent; the rule + the gate
+raise the odds and enforce once adopted, but they don't force the decision. The hooks
+are themselves the protocol's "must-always-run → hook" category, dogfooded.
+
+## Deliberately deferred (YAGNI with a trigger)
+
+Applying SOLID *where four implementations prove it* and skipping it elsewhere is the
+judgment, not cargo-culting every pattern. Not built until the trigger fires:
+
+- **Plugin-discovery framework / dynamic adapter loading** — when an *external*
+  contributor or a 5th harness actually arrives.
+- **A grand unified config schema** across all four concerns — only MCP + enforcement
+  diverge enough to warrant structure; the rest are files.
+- **Config schema-validation framework** — a small check is enough.
+- **Global git `core.hooksPath` pre-commit** that also gates *human* commits — invasive
+  (shadows repo-local hooks); out of scope for "make *agents* comply."
+
+## Per-harness quirks handled (verified against the live tools)
+
+- **Claude**: user-scope MCP lives in the stateful `~/.claude.json` and can't be
+  symlinked → render an artifact + import via the `claude` CLI as an isolated side step
+  (skipped in `--check` and any sandbox). `skillOverrides` is the only 4-tier model;
+  others collapse to hidden/visible.
+- **Copilot CLI**: stdin is `toolArgs` (a JSON *string*), not `tool_input.command`; its
+  `sessionStart` can't inject context, so the nudge runs on `userPromptSubmitted` once
+  per session (sentinel). Fail-closed harness — the gate only ever exits 0/2.
+- **VS Code Copilot**: no external user-scope instruction file → inline into settings;
+  reuses Claude's hooks via `chat.hookFilesLocations` (so its gate needs the Claude
+  adapter enabled). Requires the `additionalContext` JSON envelope.
+- **OpenCode**: no shell-hook surface → a JS plugin (`tool.execute.before` throws to
+  block); no clean session-start injection → push to the system prompt via an
+  `experimental.*` hook that degrades safely if it changes.

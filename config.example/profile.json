@@ -1,0 +1,4 @@
+{
+  "_comment": "Which harnesses to manage. Remove any you don't use; `init` only enables the ones it detects installed. Optional 'root' overrides the target (default: $HOME) — handy for dry-runs.",
+  "harnesses": ["claude", "copilot", "opencode", "vscode"]
+}

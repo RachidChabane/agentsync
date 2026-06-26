@@ -1,0 +1,7 @@
+# Your private policy lives here (copied from config.example by init). Never published.
+/config/
+
+__pycache__/
+*.pyc
+*.bak
+*.bak[0-9]*
