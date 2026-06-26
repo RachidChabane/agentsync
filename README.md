@@ -45,7 +45,7 @@ exactly what moves, and anything not listed below is yours to hand-edit freely.
 | Claude | `skillOverrides`; the SessionStart + PreToolUse[Bash] determinism hooks; `mcp-servers.json` + user-scope MCP | every other settings key/hook |
 | Copilot | `disabledSkills`; the userPromptSubmitted + preToolUse hooks; `mcp-config.json` | everything else |
 | OpenCode | `opencode.json` keys `mcp`, `permission.skill`, `instructions` | every other key |
-| VS Code | the instructions block, `chat.useCustomAgentHooks`, one `chat.hookFilesLocations` entry | everything else |
+| VS Code | the instructions block, `chat.useCustomAgentHooks`, its `chat.hookFilesLocations` + a dedicated `vscode-hooks.json` | everything else |
 
 Owned hooks are keyed by script name, so a stale entry left after the repo moves is
 replaced (not duplicated) and shows up in `verify`. Want to change an owned value? Edit
@@ -104,7 +104,7 @@ concerns:
 | Instructions | `~/.claude/CLAUDE.md` | `~/.copilot/copilot-instructions.md` | `opencode.json` ref | inlined in settings |
 | MCP servers | artifact + CLI import | `mcp-config.json` | `opencode.json` `mcp` | — (no surface) |
 | Skill tiers | `skillOverrides` (4-way) | `disabledSkills` | `permission.skill` | — |
-| Enforcement | hooks | hooks | JS plugin | reuses Claude's hooks |
+| Enforcement | hooks | hooks | JS plugin | own hooks file |
 
 Dashes are honest **graceful degradation**: VS Code exposes no MCP/skill surface, so the
 adapter declares it doesn't manage those (`capabilities()`) instead of faking it.

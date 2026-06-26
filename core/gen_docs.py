@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from core.targets import Link, Merge
+from core.targets import Json, Link, Merge
 from core.util import Ctx
 
 GROUPS = ("skills", "mcps", "hooks", "agents")
@@ -127,6 +127,13 @@ def _hooks(ctx: Ctx) -> str:
                                 [h.get("command", "") for h in g.get("hooks", [])])
                         for c in cmds:
                             rows.append(f"- `{ev}` — {_cmd_summary(c)}")
+            elif isinstance(t, Json) and isinstance(t.obj, dict) and "hooks" in t.obj:
+                for ev, groups in t.obj["hooks"].items():  # hook-file target (e.g. VS Code)
+                    for g in groups:
+                        for h in g.get("hooks", []):
+                            cmd = h.get("command", "")
+                            det = " _(determinism)_" if re.search(r"(guard-commit|session-nudge|prompt-context)\.sh", cmd) else ""
+                            rows.append(f"- `{ev}` — {_cmd_summary(cmd)}{det}")
             elif isinstance(t, Link) and t.path.name == "determinism.js":
                 rows.append(f"- `plugin` — {_script_summary(str(t.src))} _(determinism)_")
         if rows:

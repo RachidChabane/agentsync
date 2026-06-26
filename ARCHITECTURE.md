@@ -114,9 +114,11 @@ judgment, not cargo-culting every pattern. Not built until the trigger fires:
 - **Copilot CLI**: stdin is `toolArgs` (a JSON *string*), not `tool_input.command`; its
   `sessionStart` can't inject context, so the nudge runs on `userPromptSubmitted` once
   per session (sentinel). Fail-closed harness — the gate only ever exits 0/2.
-- **VS Code Copilot**: no external user-scope instruction file → inline into settings;
-  reuses Claude's hooks via `chat.hookFilesLocations` (so its gate needs the Claude
-  adapter enabled). Requires the `additionalContext` JSON envelope.
+- **VS Code Copilot**: no external user-scope instruction file → inline into settings.
+  Reads hooks from *files* (not its settings' hooks key), so it gets its own dedicated
+  agentsync hooks file (gate + nudge + the user's VS-Code hooks) via
+  `chat.hookFilesLocations` — self-contained, not borrowing Claude's file. Requires the
+  `additionalContext` JSON envelope; ignores `matcher`, so the guard self-filters.
 - **OpenCode**: no shell-hook surface → a JS plugin (`tool.execute.before` throws to
   block); no clean session-start injection → push to the system prompt via an
   `experimental.*` hook that degrades safely if it changes.

@@ -151,9 +151,6 @@ def main(argv=None) -> int:
         print(f"docs: {'regenerated ' + ', '.join(changed) if changed else 'already up to date'} "
               f"({ctx.config / 'docs'})")
         return 0
-    if "vscode" in wanted and "claude" not in wanted:
-        print("warning: vscode's commit gate reuses Claude's hooks — enable 'claude' too "
-              "or vscode has no gate.\n", file=sys.stderr)
 
     print(f"{args.command}: config={config_dir.name} root={root} harnesses={','.join(wanted)}\n")
     reports = [run_adapter(ADAPTERS[h], ctx, args.no_mcp_import) for h in wanted]
