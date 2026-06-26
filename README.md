@@ -1,5 +1,9 @@
 # agentsync
 
+[![CI](https://github.com/RachidChabane/agentsync/actions/workflows/ci.yml/badge.svg)](https://github.com/RachidChabane/agentsync/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Dependencies: none](https://img.shields.io/badge/deps-stdlib%20only-brightgreen)
+
 **One declarative config, rendered into every AI coding assistant — plus a
 determinism-over-AI protocol that makes itself stick in every repo.**
 
@@ -9,8 +13,12 @@ availability, enforcement — and `agentsync` renders it into each tool's native
 harness-agnostic, and token-efficient by design.
 
 ```bash
-git clone <repo> && cd agentsync
-./init.sh          # detects your harnesses, creates config/, installs the scaffolder
+# one-liner
+curl -fsSL https://raw.githubusercontent.com/RachidChabane/agentsync/main/install.sh | bash
+
+# or by hand
+git clone https://github.com/RachidChabane/agentsync && cd agentsync
+./init.sh          # detects your harnesses, creates config/, installs the CLIs
 #                    edit config/{instructions.md, mcp.json, skills.json} ...
 make apply         # ... then render it into every tool
 ```
@@ -140,8 +148,9 @@ calls (cheaper, predictable, testable):
 ## Extending
 
 - **New harness** → add `core/adapters/<name>.py` (subclass `Adapter`, implement
-  `capabilities()` + `apply()`), then add it to `ADAPTERS` in `core/adapters/__init__.py`.
-  The reconciler is closed for modification (Open/Closed).
+  `capabilities()` + `targets()`), then add it to `ADAPTERS` in `core/adapters/__init__.py`.
+  The reconciler is closed for modification (Open/Closed). Or just run the `add-harness`
+  skill.
 - **New task runner** → extend the four `case` blocks in `core/enforcement/_runner.sh`
   (and the `detect()` table in `opencode-plugin.js`).
 
@@ -176,3 +185,13 @@ make verify     # syntax-checks every source + runs the suite, writes nothing to
 
 Tests run the reconciler into a temp dir (never your real config) and exercise the
 commit gate in a throwaway git repo. See `ARCHITECTURE.md` for the design rationale.
+
+## Project
+
+- **Contributing:** [`CONTRIBUTING.md`](CONTRIBUTING.md) (extension points + roadmap).
+- **Security:** [`SECURITY.md`](SECURITY.md) — and never push your private `config/`.
+- **Changes:** [`CHANGELOG.md`](CHANGELOG.md) · **Conduct:** [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
+- **License:** [MIT](LICENSE).
+
+> Status: early but fully tested. The engine is dependency-free and the API may still
+> shift before 1.0 — pin a commit if you need stability.

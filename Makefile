@@ -13,7 +13,7 @@ apply:  ## render config into every enabled harness
 # 'verify' = fast, read-only, commit-safe. The commit gate runs this.
 verify:  ## syntax-check all sources + run the test suite (no writes to $HOME)
 	@python3 -m py_compile core/*.py core/adapters/*.py skills/*/*.py && echo "· python ok"
-	@for f in core/enforcement/*.sh init.sh skills/*/*.sh tests/*.sh; do bash -n "$$f" || exit 1; done && echo "· bash ok"
+	@for f in core/enforcement/*.sh init.sh install.sh skills/*/*.sh tests/*.sh; do bash -n "$$f" || exit 1; done && echo "· bash ok"
 	@node --check core/enforcement/opencode-plugin.js && echo "· node ok"
 	@for f in config.example/*.json; do python3 -c "import json,sys;json.load(open(sys.argv[1]))" "$$f" || exit 1; done && echo "· json ok"
 	@bash tests/test_runner.sh

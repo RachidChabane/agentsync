@@ -1,0 +1,35 @@
+name: Bug report
+description: Something doesn't work as documented
+labels: [bug]
+body:
+  - type: input
+    id: harness
+    attributes:
+      label: Harness(es)
+      description: Which AI assistant(s) — Claude Code, Copilot CLI, OpenCode, VS Code?
+      placeholder: Claude Code
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you ran, what you expected, what you got. Include `agentsync doctor` output if relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. agentsync apply
+        2. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `agentsync --version` and your OS.
+    validations:
+      required: false

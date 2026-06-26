@@ -1,0 +1,25 @@
+name: Feature request
+description: Propose an enhancement (new harness, runner, capability)
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do that agentsync doesn't support yet?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Proposed solution
+      description: If it's a new harness/runner, note where it reads config + its hook contract.
+    validations:
+      required: false
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Fit
+      options:
+        - label: This keeps the engine dependency-free and harness-agnostic
+        - label: I'd be willing to help implement it

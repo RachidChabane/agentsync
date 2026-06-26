@@ -19,6 +19,7 @@ import sys
 from dataclasses import replace
 from pathlib import Path
 
+from core import __version__
 from core import gen_docs
 from core import skills as skillmod
 from core.adapters import ADAPTERS
@@ -120,6 +121,7 @@ def run_adapter(adapter, ctx: Ctx, no_mcp_import: bool) -> Report:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="agentsync")
+    ap.add_argument("--version", action="version", version=f"agentsync {__version__}")
     ap.add_argument("command", choices=["apply", "verify", "diff", "uninstall", "doctor", "docs"])
     ap.add_argument("--root", help="target root to write into (default: $HOME)")
     ap.add_argument("--config", help="config dir (default: ./config, else ./config.example)")
