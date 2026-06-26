@@ -144,6 +144,21 @@ calls (cheaper, predictable, testable):
 - **New task runner** → extend the four `case` blocks in `core/enforcement/_runner.sh`
   (and the `detect()` table in `opencode-plugin.js`).
 
+## Skills — the LLM-judgment layer
+
+The engine is deterministic; tasks that genuinely need judgment ship as Agent Skills in
+`skills/`, each pairing a deterministic scaffold with forced judgment steps:
+
+- **add-harness** — support a new harness. A script scaffolds + registers the adapter
+  (deterministic); you read the harness's docs and fill its config/hook mapping (judgment).
+- **author-verify** — fill a repo's `verify` verb. A script scans for fast checks
+  (deterministic); you pick the read-only ones (judgment).
+- **import-config** — migrate a hand-built config into `config/`. You synthesize it
+  (judgment); `diff-prove.sh` proves nothing's lost (deterministic) before you switch.
+
+That's the determinism principle applied to agentsync itself: deterministic where
+encodable, AI only where it isn't — and the boundary is explicit, not blurred.
+
 ## Verify / test
 
 ```bash

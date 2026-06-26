@@ -61,6 +61,15 @@ harness-locked nor runner-locked. The principle itself is the established norm
 (Anthropic's *Building Effective Agents*: workflows over agents; 12-Factor Agents:
 own your control flow; Agent Skills: prefer scripts for deterministic ops).
 
+### The LLM-judgment layer is explicit, not blurred
+
+The engine is deterministic; the few tasks that need judgment ship as Agent Skills
+(`skills/`), each a deterministic scaffold + forced judgment steps: **add-harness**
+(scaffold an adapter ⟶ map the harness's docs), **author-verify** (scan for checks ⟶
+choose the read-only ones), **import-config** (synthesize a config ⟶ `diff-prove.sh`
+confirms nothing's lost). This is the determinism principle applied reflexively:
+deterministic where encodable, AI only where it isn't, and the boundary named.
+
 ### Enforcement is layered, and honest about its limits
 
 | Layer | Mechanism | Guarantees |
