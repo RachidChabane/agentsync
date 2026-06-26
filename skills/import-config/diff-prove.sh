@@ -16,10 +16,12 @@ SAND="$(mktemp -d)"; trap 'rm -rf "$SAND"' EXIT
 VSC="Library/Application Support/Code/User/settings.json"
 [ -d "$HOME/.config/Code" ] && VSC=".config/Code/User/settings.json"
 FILES=(
-  ".claude/settings.json" ".claude/CLAUDE.md" ".claude/mcp-servers.json"
+  ".claude/settings.json" ".claude/CLAUDE.md"
   ".copilot/settings.json" ".copilot/copilot-instructions.md" ".copilot/mcp-config.json"
   ".config/opencode/opencode.json" "$VSC"
 )
+# Note: Claude's user-scope MCP is NOT a file — it lives in the stateful ~/.claude.json
+# (CLI-imported). It's checked separately below, not via the FILES seed-and-diff.
 
 # Seed sandbox with dereferenced copies of the real files (so apply merges into them).
 for rel in "${FILES[@]}"; do
@@ -43,7 +45,29 @@ for rel in "${FILES[@]}"; do
     fails=1
   fi
 done
+
+# Claude user-scope MCP (stateful ~/.claude.json) — agentsync owns the whole set (it
+# prunes), so compare the intended set against what Claude actually has. A server live
+# but not in config/ would be PRUNED on apply — a real loss this catches.
+mcp_checked=0
+if [ -f "$SAND/.claude/mcp-servers.json" ]; then
+  if [ -f "$HOME/.claude.json" ]; then
+    live="$(python3 -c 'import json,sys;print(json.dumps(json.load(open(sys.argv[1])).get("mcpServers",{}),sort_keys=True,indent=2))' "$HOME/.claude.json" 2>/dev/null)"
+    want="$(python3 -c 'import json,sys;print(json.dumps(json.load(open(sys.argv[1])),sort_keys=True,indent=2))' "$SAND/.claude/mcp-servers.json" 2>/dev/null)"
+    if [ -n "$live$want" ]; then
+      mcp_checked=1
+      if [ "$live" = "$want" ]; then echo "  ok    ~/.claude.json mcpServers (user-scope)"
+      else echo "  DIFF  ~/.claude.json mcpServers (user-scope) — apply would change/prune these"
+           diff <(printf '%s' "$live") <(printf '%s' "$want") | sed 's/^/        /'; fails=1; fi
+    fi
+  fi
+fi
+
 echo
-[ "$fails" = 0 ] && echo "CLEAN — config/ reproduces your live setup; safe to apply." \
-                 || echo "DIFFERENCES — adjust config/ (or overrides.json) until clean."
+if [ "$fails" = 0 ]; then
+  echo "CLEAN — config/ reproduces your live setup; safe to apply."
+  [ "$mcp_checked" = 1 ] || echo "CAVEAT: could not read ~/.claude.json — verify Claude's user-scope MCP by hand (\`claude mcp list -s user\`); it is NOT covered above."
+else
+  echo "DIFFERENCES — adjust config/ (or overrides.json) until clean."
+fi
 exit "$fails"
