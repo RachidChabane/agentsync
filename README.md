@@ -10,10 +10,13 @@ harness-agnostic, and token-efficient by design.
 
 ```bash
 git clone <repo> && cd agentsync
-./init.sh          # detects your installed harnesses, applies, installs the scaffolder
+./init.sh          # detects your harnesses, creates config/, installs the scaffolder
+#                    edit config/{instructions.md, mcp.json, skills.json} ...
+make apply         # ... then render it into every tool
 ```
 
-That's it. Edit `config/`, re-run `./init.sh` (or `make apply`) to update.
+First run stops after creating `config/` (so placeholders never reach your live tools).
+After that, edit `config/` and re-run `make apply` to update — idempotent.
 
 ---
 

@@ -1,24 +1,9 @@
 {
-  "_comment": "SINGLE SOURCE for MCP servers. Each adapter renders its harness's native format. transport is 'http' (url) or 'stdio' (command+args). 'auth' marks a server needing a secret; Claude gets it via a headersHelper script, Copilot/OpenCode via a ${env}/{env:} header. Per-harness opt-out via e.g. \"opencode\": {\"enabled\": false}.",
+  "_comment": "SINGLE SOURCE for MCP servers. Each adapter renders its harness's native format. transport is 'http' (url) or 'stdio' (command+args). Add a secret-bearing server with an 'auth' block: {\"header\":\"x-api-key\",\"headersHelper\":\"~/.config/x/headers.sh\",\"env\":\"X_API_KEY\"} — Claude uses the headersHelper script, Copilot/OpenCode a ${env}/{env:} header. Opt a server out of one harness with e.g. \"opencode\":{\"enabled\":false}. Ships with one real, no-auth server so a first apply works; add your own.",
   "servers": {
     "context7": {
       "transport": "http",
       "url": "https://mcp.context7.com/mcp"
-    },
-    "example-stdio-server": {
-      "transport": "stdio",
-      "command": "npx",
-      "args": ["-y", "some-mcp-server@latest"]
-    },
-    "example-authed-server": {
-      "transport": "http",
-      "url": "https://api.example.com/mcp",
-      "auth": {
-        "header": "x-api-key",
-        "headersHelper": "~/.config/example/headers.sh",
-        "env": "EXAMPLE_API_KEY"
-      },
-      "opencode": { "enabled": false }
     }
   }
 }

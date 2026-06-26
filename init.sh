@@ -18,8 +18,10 @@ add() { detected+=("$1"); echo "  $1"; }
 [ ${#detected[@]} -gt 0 ] || echo "  none detected — edit config/profile.json by hand"
 
 echo "== Config =="
+first_run=0
 if [ ! -d config ]; then
   cp -R config.example config
+  first_run=1
   echo "  created config/ from config.example (edit it; it's yours)"
 else
   echo "  config/ exists — leaving it untouched"
@@ -44,6 +46,13 @@ mkdir -p "$HOME/.local/bin"
 ln -sfn "$REPO/core/enforcement/scaffold.sh" "$HOME/.local/bin/scaffold-determinism"
 echo "  $HOME/.local/bin/scaffold-determinism -> core/enforcement/scaffold.sh"
 case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) echo "  note: add ~/.local/bin to PATH" ;; esac
+
+if [ "$first_run" = 1 ]; then
+  echo
+  echo "config/ is fresh from the template — NOT applied yet (it still has placeholders)."
+  echo "Next: edit config/{instructions.md, mcp.json, skills.json}, then run:  make apply"
+  exit 0
+fi
 
 echo "== Apply config to harnesses =="
 python3 -m core.agentsync apply

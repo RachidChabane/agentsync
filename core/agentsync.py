@@ -36,7 +36,11 @@ def load_config(config_dir: Path):
 
 def claude_mcp_import(ctx: Ctx) -> Report:
     """Import the rendered Claude MCP artifact via the `claude` CLI (the one config that
-    can't be symlinked). Best-effort; skipped unless writing into the real $HOME."""
+    can't be symlinked). Best-effort; skipped unless writing into the real $HOME.
+
+    Declarative: a sidecar records the names we imported last time, so a server removed
+    from config is also removed from Claude (no orphans), not just the ones still listed.
+    """
     rep = Report("claude-mcp")
     artifact = ctx.root / ".claude" / "mcp-servers.json"
     if ctx.check or ctx.root != Path.home():
@@ -47,12 +51,17 @@ def claude_mcp_import(ctx: Ctx) -> Report:
         rep.skipped("mcp import: `claude` CLI not found — run `claude mcp add-json` yourself")
         return rep
     servers = json.loads(artifact.read_text())
+    state = ctx.root / ".claude" / ".agentsync-mcp.json"   # names we own, from last run
+    prev = set(json.loads(state.read_text())) if state.exists() else set()
+    for name in prev - set(servers):                       # prune servers we dropped
+        subprocess.run(["claude", "mcp", "remove", name, "-s", "user"], capture_output=True)
+        rep.wrote(f"mcp prune: {name}")
     for name, spec in servers.items():
-        subprocess.run(["claude", "mcp", "remove", name, "-s", "user"],
-                       capture_output=True)
+        subprocess.run(["claude", "mcp", "remove", name, "-s", "user"], capture_output=True)
         r = subprocess.run(["claude", "mcp", "add-json", name, json.dumps(spec), "-s", "user"],
                            capture_output=True)
         (rep.wrote if r.returncode == 0 else rep.skipped)(f"mcp import: {name}")
+    state.write_text(json.dumps(sorted(servers)))
     return rep
 
 
