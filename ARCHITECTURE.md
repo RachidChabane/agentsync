@@ -70,6 +70,14 @@ choose the read-only ones), **import-config** (synthesize a config ⟶ `diff-pro
 confirms nothing's lost). This is the determinism principle applied reflexively:
 deterministic where encodable, AI only where it isn't, and the boundary named.
 
+### Inventory docs are generated, not maintained
+
+`config/docs/{skills,mcps,hooks,agents}.md` are derived from the sources (frontmatter
+`description:`, `mcp.json`, the wired hooks) by `gen_docs.py`, regenerated on every
+`apply` and drift-checked on `verify`. This is the determinism principle applied to
+documentation: a generated artifact + a drift gate beats a doc someone must remember to
+update — exactly the "repeatable → deterministic" rule, dogfooded.
+
 ### Enforcement is layered, and honest about its limits
 
 | Layer | Mechanism | Guarantees |

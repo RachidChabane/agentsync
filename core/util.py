@@ -17,6 +17,7 @@ HIDDEN_TIERS = {"user-invocable-only", "off"}
 class Ctx:
     repo: Path          # this checkout (source of enforcement scripts)
     root: Path          # target root (default $HOME; a temp dir in tests)
+    config: Path        # the config dir (holds instructions/skills/mcp/overrides + docs/)
     instructions: Path  # rendered instructions markdown
     skills: dict        # skill name -> tier
     servers: dict       # MCP servers, single-source schema

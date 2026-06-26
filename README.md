@@ -30,6 +30,7 @@ repo's `config/`):
 | `agentsync diff` | **preview the exact change** (unified diff) before touching anything |
 | `agentsync uninstall` | remove only what agentsync added; restore `.bak` originals |
 | `agentsync doctor` | health check: harnesses, runners, PATH, MCP auth, drift, broken links |
+| `agentsync docs` | regenerate the inventory docs (also runs automatically on every `apply`) |
 
 `--root DIR` targets a sandbox instead of `$HOME`; `--harness NAME` limits scope.
 
@@ -143,6 +144,14 @@ calls (cheaper, predictable, testable):
   The reconciler is closed for modification (Open/Closed).
 - **New task runner** → extend the four `case` blocks in `core/enforcement/_runner.sh`
   (and the `detect()` table in `opencode-plugin.js`).
+
+## Inventory docs (auto-maintained)
+
+`config/docs/{skills,mcps,hooks,agents}.md` — one line per item — are **generated from
+the sources** (each skill's/agent's `description:` frontmatter, `mcp.json`, the wired
+hooks). They regenerate on every `agentsync apply` and are drift-checked by `agentsync
+verify`, so they never go stale and nobody has to remember to update them. Don't hand-edit
+them (each carries an AUTO-GENERATED banner).
 
 ## Skills — the LLM-judgment layer
 

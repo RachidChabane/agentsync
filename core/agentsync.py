@@ -19,6 +19,7 @@ import sys
 from dataclasses import replace
 from pathlib import Path
 
+from core import gen_docs
 from core import skills as skillmod
 from core.adapters import ADAPTERS
 from core.targets import ClaudeMcp, Link
@@ -119,7 +120,7 @@ def run_adapter(adapter, ctx: Ctx, no_mcp_import: bool) -> Report:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="agentsync")
-    ap.add_argument("command", choices=["apply", "verify", "diff", "uninstall", "doctor"])
+    ap.add_argument("command", choices=["apply", "verify", "diff", "uninstall", "doctor", "docs"])
     ap.add_argument("--root", help="target root to write into (default: $HOME)")
     ap.add_argument("--config", help="config dir (default: ./config, else ./config.example)")
     ap.add_argument("--harness", action="append", help="limit to these harnesses (repeatable)")
@@ -139,12 +140,17 @@ def main(argv=None) -> int:
     norm = skillmod.normalize(skills_cfg)
     skill_paths = skillmod.resolve(norm, root / ".cache/agentsync/skills",
                                    do_fetch=(args.command == "apply"))
-    ctx = Ctx(repo=REPO, root=root, instructions=config_dir / "instructions.md",
+    ctx = Ctx(repo=REPO, root=root, config=config_dir, instructions=config_dir / "instructions.md",
               skills=skillmod.tiers(norm), servers=servers, profile=profile,
               verb=args.command, skill_paths=skill_paths, overrides=overrides)
 
     if args.command == "doctor":
         return doctor(ctx, wanted)
+    if args.command == "docs":
+        changed, _ = gen_docs.generate(ctx, write=True)
+        print(f"docs: {'regenerated ' + ', '.join(changed) if changed else 'already up to date'} "
+              f"({ctx.config / 'docs'})")
+        return 0
     if "vscode" in wanted and "claude" not in wanted:
         print("warning: vscode's commit gate reuses Claude's hooks — enable 'claude' too "
               "or vscode has no gate.\n", file=sys.stderr)
@@ -164,6 +170,17 @@ def main(argv=None) -> int:
             print("\n--- pending changes ---")
             print("".join(blocks))
     print()
+
+    # Inventory docs: regenerate on apply, drift-check on verify (kept automatically fresh).
+    if args.command == "apply":
+        changed, _ = gen_docs.generate(ctx, write=True)
+        if changed:
+            print(f"[docs] regenerated: {', '.join(changed)}")
+    elif args.command == "verify":
+        _, doc_drift = gen_docs.generate(ctx, write=False)
+        if doc_drift:
+            drift = True
+            print("[docs] out of date — run `apply` (or `agentsync docs`)")
 
     if args.command == "verify":
         print("DRIFT — run `apply` to converge." if drift else "ok: all harnesses match config.")
