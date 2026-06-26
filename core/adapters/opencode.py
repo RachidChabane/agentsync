@@ -30,12 +30,13 @@ class OpenCode(Adapter):
         servers = {n: mcp_entry(s) for n, s in ctx.servers.items()}
         skill_perms = {"*": "allow"}
         skill_perms.update({s: "deny" for s, t in ctx.skills.items() if t in HIDDEN_TIERS})
+        extra_owned, extra_hooks = self._passthrough(ctx)
         return [
             Merge(base / "opencode.json",
                   owned=[(("mcp",), servers),
                          (("permission", "skill"), skill_perms),
-                         (("instructions",), [str(ctx.instructions)])],
-                  hooks=[], label="config"),
+                         (("instructions",), [str(ctx.instructions)])] + extra_owned,
+                  hooks=[], extra_hooks=extra_hooks, label="config"),
             Link(base / "plugin" / "determinism.js",
                  ctx.enforce_dir / "opencode-plugin.js", "plugin"),
         ]

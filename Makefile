@@ -19,5 +19,6 @@ verify:  ## syntax-check all sources + run the test suite (no writes to $HOME)
 	@bash tests/test_runner.sh
 	@python3 tests/test_apply.py
 	@python3 tests/test_lifecycle.py
+	@python3 tests/test_skills.py
 
 test: verify  ## alias for verify (suite is fast)

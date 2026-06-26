@@ -1,5 +1,5 @@
 {
-  "_comment": "Single source for skill availability across harnesses. Set a tier per skill HERE; each adapter renders its harness's native control (Claude 4-way skillOverrides; Copilot disabledSkills; OpenCode permission.skill). Skills not listed default to 'on'.",
+  "_comment": "Single source for skill availability across harnesses. Set a tier per skill HERE; each adapter renders its harness's native control (Claude 4-way skillOverrides; Copilot disabledSkills; OpenCode permission.skill). A value is either a tier string, or an object {\"tier\":..., \"source\":\"<local dir or git url>\", \"subpath\":\"skills/x\"} — when a source is given, agentsync symlinks the skill into Claude's & Copilot's skills dirs (cloning/pulling git sources on apply). Skills not listed default to 'on'.",
   "_tiers": {
     "on": "name + description in context; model can auto-invoke. Reserve for genuinely every-session skills (the description costs tokens always).",
     "name-only": "name in context, description omitted; model can still discover. Generic dev skills used across projects but not every session.",
@@ -9,6 +9,8 @@
   "skills": {
     "example-every-session-skill": "on",
     "example-generic-dev-skill": "name-only",
-    "example-domain-skill": "user-invocable-only"
+    "example-domain-skill": "user-invocable-only",
+    "example-sourced-skill": {"tier": "name-only", "source": "~/path/to/a/skill-dir"},
+    "example-git-skill": {"tier": "on", "source": "https://github.com/org/repo", "subpath": "skills/thing"}
   }
 }

@@ -17,10 +17,11 @@ class VSCode(Adapter):
 
     def targets(self, ctx: Ctx) -> list:
         text = ctx.instructions.read_text()
+        extra_owned, extra_hooks = self._passthrough(ctx)
         return [
             Merge(vscode_user_dir(ctx.root) / "settings.json",
                   owned=[(("github.copilot.chat.codeGeneration.instructions",), [{"text": text}]),
                          (("chat.useCustomAgentHooks",), True),
-                         (("chat.hookFilesLocations", "~/.claude/settings.json"), True)],
-                  hooks=[], label="settings"),
+                         (("chat.hookFilesLocations", "~/.claude/settings.json"), True)] + extra_owned,
+                  hooks=[], extra_hooks=extra_hooks, label="settings"),
         ]

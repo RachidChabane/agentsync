@@ -29,13 +29,15 @@ class Claude(Adapter):
         overrides = {s: t for s, t in ctx.skills.items() if t != "on"}  # 'on' = omit
         nudge = str(ctx.enforce_dir / "session-nudge.sh")
         guard = str(ctx.enforce_dir / "guard-commit.sh")
+        extra_owned, extra_hooks = self._passthrough(ctx)
         return [
             Link(base / "CLAUDE.md", ctx.instructions, "instructions"),
             Json(base / "mcp-servers.json", servers, "mcp"),
             Merge(base / "settings.json",
-                  owned=[(("skillOverrides",), overrides)],
+                  owned=[(("skillOverrides",), overrides)] + extra_owned,
                   hooks=[HookSpec("SessionStart", f'"{nudge}" || true', "session-nudge.sh"),
                          HookSpec("PreToolUse", f'"{guard}"', "guard-commit.sh", matcher="Bash")],
-                  label="settings"),
+                  extra_hooks=extra_hooks, label="settings"),
             ClaudeMcp(servers, ctx.root),
+            *self._skill_links(ctx, base / "skills"),
         ]

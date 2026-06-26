@@ -1,0 +1,7 @@
+{
+  "_comment": "Optional per-harness settings passthrough. Arbitrary keys here are merged into that harness's settings file and owned by agentsync (edits in config/ win; the rest of the file is preserved). Use for tool-specific prefs the four core concerns don't cover — e.g. {\"claude\": {\"effortLevel\": \"high\", \"enabledPlugins\": {...}}}. A 'hooks' object is merged ADDITIVELY alongside the determinism hooks (e.g. your own notification hooks). Leave a harness empty to passthrough nothing.",
+  "claude": {},
+  "copilot": {},
+  "opencode": {},
+  "vscode": {}
+}

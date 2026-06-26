@@ -21,6 +21,18 @@ class Adapter:
     def targets(self, ctx: Ctx) -> list:
         raise NotImplementedError
 
+    def _passthrough(self, ctx: Ctx):
+        """User's arbitrary settings for this harness (config/overrides.json): scalar/
+        object keys owned wholesale, plus optional additive `hooks`."""
+        ov = ctx.overrides.get(self.name, {})
+        owned = [((k,), v) for k, v in ov.items() if k != "hooks"]
+        return owned, ov.get("hooks", {})
+
+    def _skill_links(self, ctx: Ctx, skills_dir):
+        from ..targets import Link
+        return [Link(skills_dir / name, p, f"skill:{name}")
+                for name, p in ctx.skill_paths.items() if p]
+
 
 from .claude import Claude          # noqa: E402
 from .copilot import Copilot        # noqa: E402

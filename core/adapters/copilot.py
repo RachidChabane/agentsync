@@ -29,12 +29,14 @@ class Copilot(Adapter):
         hidden = sorted(s for s, t in ctx.skills.items() if t in HIDDEN_TIERS)
         nudge = str(ctx.enforce_dir / "prompt-context.sh")
         guard = str(ctx.enforce_dir / "guard-commit.sh")
+        extra_owned, extra_hooks = self._passthrough(ctx)
         return [
             Link(base / "copilot-instructions.md", ctx.instructions, "instructions"),
             Json(base / "mcp-config.json", servers, "mcp"),
             Merge(base / "settings.json",
-                  owned=[(("disabledSkills",), hidden)],
+                  owned=[(("disabledSkills",), hidden)] + extra_owned,
                   hooks=[HookSpec("userPromptSubmitted", nudge, "prompt-context.sh", key="bash"),
                          HookSpec("preToolUse", guard, "guard-commit.sh", matcher="bash", key="bash")],
-                  label="settings"),
+                  extra_hooks=extra_hooks, label="settings"),
+            *self._skill_links(ctx, base / "skills"),
         ]

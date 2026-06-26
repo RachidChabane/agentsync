@@ -156,17 +156,23 @@ class HookSpec:
 class Merge(Target):
     """A file shared with the user. We own specific key-paths (replaced wholesale) and
     specific hooks (kept exactly-once); everything else is preserved."""
-    def __init__(self, path: Path, owned: list, hooks: list, label: str):
+    def __init__(self, path: Path, owned: list, hooks: list, label: str, extra_hooks: dict | None = None):
         self.path, self.owned, self.hooks, self.label = path, owned, hooks, label
+        self.extra_hooks = extra_hooks or {}   # event -> [user hook groups], merged additively
 
     def _desired(self, cur: dict) -> dict:
         d = copy.deepcopy(cur)
         for path, value in self.owned:
             set_path(d, path, value)
-        if self.hooks:
+        if self.hooks or self.extra_hooks:
             hb = d.setdefault("hooks", {})
             for spec in self.hooks:
                 spec.sync(hb)
+            for ev, groups in self.extra_hooks.items():
+                arr = hb.setdefault(ev, [])
+                for g in groups:
+                    if g not in arr:
+                        arr.append(g)
         return d
 
     def _without(self, cur: dict) -> dict:
@@ -176,6 +182,9 @@ class Merge(Target):
         hb = d.get("hooks", {})
         for spec in self.hooks:
             spec.strip(hb)
+        for ev, groups in self.extra_hooks.items():
+            if ev in hb:
+                hb[ev][:] = [e for e in hb[ev] if e not in groups]
         for ev in [k for k, v in hb.items() if not v]:
             del hb[ev]
         if "hooks" in d and not d["hooks"]:

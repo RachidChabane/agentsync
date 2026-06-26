@@ -22,6 +22,8 @@ class Ctx:
     servers: dict       # MCP servers, single-source schema
     profile: dict       # harnesses + options
     verb: str = "apply"  # apply | verify | diff | uninstall
+    skill_paths: dict = field(default_factory=dict)  # name -> resolved dir (or None)
+    overrides: dict = field(default_factory=dict)    # harness -> extra settings keys
 
     @property
     def check(self) -> bool:

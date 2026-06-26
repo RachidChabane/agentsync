@@ -19,6 +19,7 @@ import sys
 from dataclasses import replace
 from pathlib import Path
 
+from core import skills as skillmod
 from core.adapters import ADAPTERS
 from core.targets import ClaudeMcp, Link
 from core.util import Ctx, Report
@@ -36,7 +37,8 @@ def load_config(config_dir: Path):
             return json.loads(p.read_text())
         except json.JSONDecodeError as e:
             sys.exit(f"error: {p} is not valid JSON ({e})")
-    return jload("profile.json"), jload("skills.json").get("skills", {}), jload("mcp.json").get("servers", {})
+    return (jload("profile.json"), jload("skills.json").get("skills", {}),
+            jload("mcp.json").get("servers", {}), jload("overrides.json"))
 
 
 def _installed(name: str, root: Path) -> bool:
@@ -126,7 +128,7 @@ def main(argv=None) -> int:
 
     config_dir = Path(args.config) if args.config else (
         REPO / "config" if (REPO / "config").exists() else REPO / "config.example")
-    profile, skills, servers = load_config(config_dir)
+    profile, skills_cfg, servers, overrides = load_config(config_dir)
 
     root = Path(args.root).expanduser() if args.root else \
         Path(profile["root"]).expanduser() if profile.get("root") else Path.home()
@@ -134,8 +136,12 @@ def main(argv=None) -> int:
     unknown = [h for h in wanted if h not in ADAPTERS]
     if unknown:
         sys.exit(f"unknown harness(es): {', '.join(unknown)} (known: {', '.join(ADAPTERS)})")
+    norm = skillmod.normalize(skills_cfg)
+    skill_paths = skillmod.resolve(norm, root / ".cache/agentsync/skills",
+                                   do_fetch=(args.command == "apply"))
     ctx = Ctx(repo=REPO, root=root, instructions=config_dir / "instructions.md",
-              skills=skills, servers=servers, profile=profile, verb=args.command)
+              skills=skillmod.tiers(norm), servers=servers, profile=profile,
+              verb=args.command, skill_paths=skill_paths, overrides=overrides)
 
     if args.command == "doctor":
         return doctor(ctx, wanted)

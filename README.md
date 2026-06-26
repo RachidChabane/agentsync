@@ -75,18 +75,28 @@ be; use AI only for work that needs judgment that can't be encoded.* See below.
 
 ```
 config/ (yours)                core/ (the engine, harness-agnostic)
-├── instructions.md            ├── agentsync.py        reconciler: apply / verify
-├── skills.json   (tiers)      ├── adapters/           one per harness (the only
-├── mcp.json      (servers)    │   ├── claude.py        per-harness knowledge)
-└── profile.json  (enabled)    │   ├── copilot.py
-                               │   ├── opencode.py
-                               │   └── vscode.py
-                               └── util.py             idempotent fs convergence
+├── instructions.md            ├── agentsync.py    reconciler: apply/verify/diff/…
+├── skills.json   (tiers       ├── targets.py      declarative target model
+│                  + sources)  ├── adapters/       one per harness (the only
+├── mcp.json      (servers)    │   ├── claude.py    per-harness knowledge)
+├── profile.json  (enabled)    │   ├── copilot.py
+└── overrides.json (passthru)  │   ├── opencode.py / vscode.py
+                               ├── skills.py       skill source resolution (local/git)
+                               └── util.py         context, report, fs primitives
 ```
 
 You bring `config/`; the engine renders it. Each **adapter** translates the shared
 config into one harness's dialect. Adding a new harness = one new adapter module + one
 registry line — nothing else changes.
+
+Two `config/` knobs make agentsync able to own your *whole* setup, not just four
+concerns:
+- **Skill sourcing** — a skill entry can carry a `source` (local dir or git URL) and
+  agentsync symlinks it into Claude's & Copilot's skills dirs (cloning/pulling git
+  sources on apply), so skills are managed declaratively, not by hand.
+- **Settings passthrough** (`overrides.json`) — own arbitrary per-harness settings keys
+  (plugins, status line, model effort) and add your own hooks alongside the determinism
+  ones. This is what lets agentsync replace a hand-maintained config wholesale.
 
 | Concern | Claude Code | Copilot CLI | OpenCode | VS Code Copilot |
 |---|---|---|---|---|
