@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# agentsync CLI — run the engine from anywhere. Resolves the repo from this script's own
+# (possibly symlinked) location, so `agentsync apply` works in any cwd against the repo's
+# config/. Installed on PATH by init.sh (symlinked into ~/.local/bin).
+set -euo pipefail
+src="${BASH_SOURCE[0]}"
+while [ -L "$src" ]; do
+  dir="$(cd "$(dirname "$src")" && pwd)"
+  src="$(readlink "$src")"; [ "${src#/}" = "$src" ] && src="$dir/$src"
+done
+REPO="$(cd "$(dirname "$src")/.." && pwd)"
+cd "$REPO" && exec python3 -m core.agentsync "$@"

@@ -1,10 +1,11 @@
-"""OpenCode adapter. ~/.config/opencode/opencode.json (mcp + skill permissions +
-instructions) and a symlinked enforcement plugin. Enforcement is a JS plugin (OpenCode
-has no shell-hook surface); the nudge degrades safely if experimental hooks change."""
+"""OpenCode adapter. ~/.config/opencode/opencode.json (owns the mcp block, the
+permission.skill map, and the instructions ref — preserving everything else) plus a
+symlinked enforcement plugin."""
 from __future__ import annotations
 
 from . import Adapter
-from ..util import Ctx, HIDDEN_TIERS, Report, merge_json, symlink
+from ..targets import Link, Merge
+from ..util import Ctx, HIDDEN_TIERS
 
 
 def mcp_entry(s: dict) -> dict:
@@ -24,19 +25,17 @@ class OpenCode(Adapter):
     def capabilities(self) -> set:
         return {"instructions", "skills", "mcp", "enforcement"}
 
-    def apply(self, ctx: Ctx) -> Report:
-        rep = Report(self.name)
+    def targets(self, ctx: Ctx) -> list:
         base = ctx.root / ".config" / "opencode"
-
+        servers = {n: mcp_entry(s) for n, s in ctx.servers.items()}
         skill_perms = {"*": "allow"}
         skill_perms.update({s: "deny" for s, t in ctx.skills.items() if t in HIDDEN_TIERS})
-
-        def mutate(d: dict):
-            d["mcp"] = {n: mcp_entry(s) for n, s in ctx.servers.items()}
-            d.setdefault("permission", {})["skill"] = skill_perms
-            d["instructions"] = [str(ctx.instructions)]
-
-        merge_json(base / "opencode.json", mutate, ctx, rep, "config")
-        symlink(base / "plugin" / "determinism.js",
-                ctx.enforce_dir / "opencode-plugin.js", ctx, rep, "plugin")
-        return rep
+        return [
+            Merge(base / "opencode.json",
+                  owned=[(("mcp",), servers),
+                         (("permission", "skill"), skill_perms),
+                         (("instructions",), [str(ctx.instructions)])],
+                  hooks=[], label="config"),
+            Link(base / "plugin" / "determinism.js",
+                 ctx.enforce_dir / "opencode-plugin.js", "plugin"),
+        ]

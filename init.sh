@@ -38,13 +38,14 @@ print(f"  profile harnesses = {', '.join(harnesses)}")
 PY
 fi
 
-echo "== Make enforcement scripts executable =="
-chmod +x core/enforcement/*.sh init.sh 2>/dev/null || true
+echo "== Make scripts executable =="
+chmod +x core/enforcement/*.sh init.sh bin/agentsync 2>/dev/null || true
 
-echo "== Install scaffold-determinism on PATH =="
+echo "== Install CLIs on PATH =="
 mkdir -p "$HOME/.local/bin"
+ln -sfn "$REPO/bin/agentsync" "$HOME/.local/bin/agentsync"
 ln -sfn "$REPO/core/enforcement/scaffold.sh" "$HOME/.local/bin/scaffold-determinism"
-echo "  $HOME/.local/bin/scaffold-determinism -> core/enforcement/scaffold.sh"
+echo "  $HOME/.local/bin/{agentsync, scaffold-determinism}"
 case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) echo "  note: add ~/.local/bin to PATH" ;; esac
 
 if [ "$first_run" = 1 ]; then

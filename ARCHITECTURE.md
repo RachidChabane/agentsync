@@ -29,8 +29,11 @@ brings their own policy. Everything else below is downstream of this cut.
   (`capabilities()`, `apply(ctx)`). `ADAPTERS` is a plain dict. Four real
   implementations justify the abstraction; there is deliberately **no** plugin-discovery
   DSL or dynamic loader — that would be speculative for four in-repo adapters.
-- **Reconciliation loop (declarative IaC, à la Terraform/Ansible).** Adapters describe
-  desired state; `util.py` converges a file to it (`apply`) or diffs it (`verify`).
+- **Reconciliation loop (declarative IaC, à la Terraform/Ansible).** Each adapter
+  describes *what it manages* as a list of `targets.py` objects (Link / Json / Merge /
+  ClaudeMcp); the reconciler interprets that one description for **five verbs** — apply
+  (converge), verify (drift), diff (preview), uninstall (surgical removal), doctor
+  (inspect). Adding a verb touches the targets, not the four adapters.
   Every helper is idempotent, so re-running is a no-op and `verify` right after `apply`
   is clean. Drift for shared files (e.g. `settings.json`) is defined as *"would our
   managed keys change?"* — computed by running the same idempotent mutation on a copy —

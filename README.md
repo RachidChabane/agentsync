@@ -18,6 +18,38 @@ make apply         # ... then render it into every tool
 First run stops after creating `config/` (so placeholders never reach your live tools).
 After that, edit `config/` and re-run `make apply` to update — idempotent.
 
+## Commands
+
+`init.sh` puts an `agentsync` CLI on your PATH; run it from anywhere (it operates on the
+repo's `config/`):
+
+| Command | What it does |
+|---|---|
+| `agentsync apply` | render config into every enabled harness (idempotent) |
+| `agentsync verify` | read-only drift check; exit 1 if any harness diverged |
+| `agentsync diff` | **preview the exact change** (unified diff) before touching anything |
+| `agentsync uninstall` | remove only what agentsync added; restore `.bak` originals |
+| `agentsync doctor` | health check: harnesses, runners, PATH, MCP auth, drift, broken links |
+
+`--root DIR` targets a sandbox instead of `$HOME`; `--harness NAME` limits scope.
+
+## What agentsync owns vs preserves
+
+agentsync edits *shared* config files (your `settings.json`) by **merge**: it owns a few
+specific keys and leaves everything else alone. So `agentsync diff` before `apply` shows
+exactly what moves, and anything not listed below is yours to hand-edit freely.
+
+| Harness | Owned (set from `config/`, hand-edits overwritten) | Preserved |
+|---|---|---|
+| Claude | `skillOverrides`; the SessionStart + PreToolUse[Bash] determinism hooks; `mcp-servers.json` + user-scope MCP | every other settings key/hook |
+| Copilot | `disabledSkills`; the userPromptSubmitted + preToolUse hooks; `mcp-config.json` | everything else |
+| OpenCode | `opencode.json` keys `mcp`, `permission.skill`, `instructions` | every other key |
+| VS Code | the instructions block, `chat.useCustomAgentHooks`, one `chat.hookFilesLocations` entry | everything else |
+
+Owned hooks are keyed by script name, so a stale entry left after the repo moves is
+replaced (not duplicated) and shows up in `verify`. Want to change an owned value? Edit
+`config/`, not the tool's file.
+
 ---
 
 ## Why

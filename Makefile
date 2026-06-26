@@ -18,5 +18,6 @@ verify:  ## syntax-check all sources + run the test suite (no writes to $HOME)
 	@for f in config.example/*.json; do python3 -c "import json,sys;json.load(open(sys.argv[1]))" "$$f" || exit 1; done && echo "· json ok"
 	@bash tests/test_runner.sh
 	@python3 tests/test_apply.py
+	@python3 tests/test_lifecycle.py
 
 test: verify  ## alias for verify (suite is fast)
