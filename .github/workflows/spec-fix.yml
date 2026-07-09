@@ -7,12 +7,14 @@ name: spec-fix
 # Without the secret the job exits politely — the drift issue still stands for a human.
 on:
   issues:
-    types: [opened]
+    types: [opened, reopened]  # reopen a drift issue to re-run the agent
 
 permissions:
   contents: write
   pull-requests: write
   issues: write
+  id-token: write  # the action exchanges an OIDC token for its GitHub app token
+  actions: read
 
 jobs:
   fix:
