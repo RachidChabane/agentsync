@@ -1,0 +1,645 @@
+Adding custom instructions for GitHub Copilot CLI - GitHub Docs
+Skip to main content
+GitHub Docs
+Version: Free, Pro, & Team
+Search or ask Copilot
+Search or askCopilot
+Select language: current language is English
+Search or ask Copilot
+Search or askCopilot
+Open menu
+Open Sidebar
+GitHub Copilot
+How-tos
+Copilot CLI
+Customize Copilot CLI
+Add custom instructions
+Home
+GitHub Copilot
+Get started
+Quickstart
+What is GitHub Copilot?
+Plans
+Features
+Best practices
+Enterprise AI governance
+Concepts
+Completions
+Code suggestions
+Code referencing
+Chat
+Agents
+Cloud agent
+About cloud agent
+Agent management
+Custom agents
+About automations
+Access management
+MCP and cloud agent
+Risks and mitigations
+Copilot CLI
+About Copilot CLI
+Comparing CLI features
+Copilot CLI in Actions
+Cancel and roll back
+Context management
+About remote control
+Custom agents
+Autonomous task completion
+Parallel task execution
+Researching with Copilot
+Session data
+About rubber duck
+LSP servers
+CLI extensions
+Tool search
+GitHub Copilot app
+Copilot in JetBrains
+Code review
+Agentic Workflows
+Copilot Memory
+Hooks
+Plugins
+Enterprise plugin standards
+Third-party coding agents
+Agent apps
+OpenAI Codex
+Anthropic Claude
+Agent skills
+Enterprise management
+Cloud and local sandboxes
+Spark
+Copilot usage metrics
+All articles
+Copilot usage metrics
+Prompting
+Prompt engineering
+Response customization
+Context
+MCP
+Spaces
+Repository indexing
+Content exclusion
+Tools
+AI tools
+About Copilot integrations
+Models
+Utility models
+Auto model selection
+FedRAMP models
+Base and LTS models
+Usage limits
+Billing
+Billing for individuals
+Billing for organizations and enterprises
+Budgets
+Individual plans
+Organizations and enterprises
+Copilot-only enterprises
+Policies
+MCP management
+Network settings
+New features and models
+How-tos
+Copilot on GitHub
+Set up Copilot
+Enable Copilot
+Set up for self
+Set up for organization
+Set up for enterprise
+Set up a dedicated enterprise
+Set up for students
+Set up for teachers and OS maintainers
+Configure access to AI models
+Configure automatic review
+Configure runners
+Chat with Copilot
+Get started with chat
+Chat in GitHub
+Chat in Mobile
+Customize Copilot
+Customize Copilot overview
+Add custom instructions
+Add personal instructions
+Add repository instructions
+Add organization instructions
+Customize cloud agent
+Create custom agents
+Add agent skills
+Use hooks
+Customize the agent environment
+Configure secrets and variables
+Customize the agent firewall
+Test custom agents
+Configure MCP servers
+Spaces
+Create Copilot Spaces
+Collaborate with others
+Copilot for GitHub tasks
+Use Copilot to create or update issues
+Create a PR summary
+Use the GitHub MCP Server from Copilot Chat
+Use Copilot agents
+Get started
+Kick off a task
+Research, plan, iterate
+Manage agent sessions
+Copilot code review
+Review Copilot output
+Set up
+Set up for self
+Install Copilot extension
+Get code suggestions
+Get IDE code suggestions
+Find matching code
+Chat with Copilot
+Get started with Chat in your IDE
+Chat in IDE
+Chat in Windows Terminal
+Copilot CLI
+All articles
+Copilot CLI quickstart
+Copilot CLI best practices
+Set up Copilot CLI
+Install Copilot CLI
+Authenticate Copilot CLI
+Configure Copilot CLI
+Add LSP servers
+Troubleshoot Copilot CLI auth
+Use Copilot CLI
+Overview
+Allowing tools
+Voice input
+Connect to VS Code
+Delegate tasks to Copilot
+Browse issues, PRs, gists
+Roll back changes
+Invoke custom agents
+Steer agents
+Steer a session remotely
+Set an AI credit limit
+Agentic code review
+Manage pull requests
+Speed up task completion
+Use session data
+Automate with Copilot CLI
+Quickstart
+Run the CLI programmatically
+Schedule prompts
+Automate with Actions
+Customize Copilot CLI
+Overview
+Add custom instructions
+Change settings
+Use hooks
+Add agent skills
+Add MCP servers
+Create custom agents
+Use your own model provider
+Plugins: Find and install
+Plugins: Create a plugin
+Plugins: Create a marketplace
+Administer for enterprise
+Copilot CLI in Actions
+Cloud and local sandboxes for GitHub Copilot
+Enable or disable cloud sandboxes
+Configure local sandbox
+GitHub Copilot app
+All articles
+Quickstart
+Customize the GitHub Copilot app
+Agent sessions
+Canvas extensions
+Managing issues and pull requests
+Automations
+Use your own model provider
+Open with deep links
+Copilot SDK
+Authentication
+Authenticate
+BYOK
+Features
+Agent Loop
+Cloud Sessions
+Custom Agents
+Fleet Mode
+Hooks
+Image Input
+MCP
+Plugin Directories
+Remote Sessions
+Session limits
+Session Persistence
+Skills
+Steering And Queueing
+Streaming Events
+Getting Started
+Use hooks
+Error Handling
+Hooks Overview
+Post Tool Use
+Pre Tool Use
+Session Lifecycle
+User Prompt Submitted
+Integrations
+Microsoft Agent Framework
+Observability
+Opentelemetry
+Set up Copilot SDK
+Azure Managed Identity
+Backend Services
+Bundled CLI
+Choosing A Setup Path
+GitHub OAuth
+Local CLI
+Multi Tenancy
+Scaling
+Troubleshooting
+Compatibility
+Debugging
+MCP Debugging
+GitHub Agentic Workflows
+Quickstart
+Creating agentic workflows
+Use Copilot agents
+Cloud agent
+Start Copilot sessions
+Create cloud automations
+Changing the AI model
+Configuring agent settings
+Create custom agents in your IDE
+Use cloud agent on GitHub
+Use cloud agent on GitHub Mobile
+Use agent apps
+Use cloud agent in your IDE
+Use cloud agent via the API
+Use cloud agent from the GitHub CLI
+Use cloud agent via GitHub MCP Server
+Integrate cloud agent with Jira
+Integrate cloud agent with Slack
+Integrate cloud agent with Teams
+Integrate cloud agent with Linear
+Integrate cloud agent with Azure Boards
+Use cloud agent from Raycast
+Troubleshoot cloud agent
+Request a code review
+Use code review
+Copilot Memory
+Manage for yourself
+Manage as administrator
+Use AI models
+Change the chat model
+Change the completion model
+Provide context
+Use Copilot Spaces
+Use Copilot Spaces
+Use MCP in your IDE
+Extend Copilot Chat with MCP
+Set up the GitHub MCP Server
+Enterprise configuration
+Configure toolsets
+Use the GitHub MCP Server
+Change MCP registry
+Configure custom instructions
+Add repository instructions in your IDE
+Configure content exclusion
+Exclude content from Copilot
+Review changes
+Use Copilot for common tasks
+Use Copilot in the CLI
+Configure personal settings
+Configure network settings
+Configure in IDE
+Authenticate to GHE.com
+Manage and track spending
+Monitor AI credits usage
+Manage company spending
+Manage your account
+Get started with a Copilot plan
+View and change your Copilot plan
+Disable Copilot Free
+Manage policies
+Administer Copilot
+Manage for organization
+Manage plan
+Cancel
+Manage access
+Grant access
+Manage requests for access
+Revoke access
+Manage network access
+Manage policies
+Add Copilot cloud agent
+Configure agent runners
+Prepare for custom agents
+Manage default models
+Review activity
+Review user activity data
+Use your own API keys
+Manage for enterprise
+Manage plan
+Subscribe
+Cancel plan
+Upgrade plan
+Downgrade subscription
+Manage access
+Grant access
+Disable for organizations
+View license usage
+Manage network access
+Manage enterprise policies
+Manage agents
+Prepare for custom agents
+Create github-private repository
+Enterprise managed settings
+Monitor agentic activity
+Enable Copilot cloud agent
+Block agentic features
+Enable Copilot code review
+Manage Spark
+Manage model availability
+Use your own API keys
+Review audit logs
+Manage MCP usage
+Configure MCP registry
+Configure MCP server access
+Download activity report
+View usage and adoption
+View code generation
+Troubleshoot Copilot
+Troubleshoot common issues
+View logs
+Troubleshoot firewall settings
+Troubleshoot network errors
+Troubleshoot Spark
+Troubleshoot slow responses
+Reference
+Chat cheat sheet
+Customization cheat sheet
+AI models
+Supported models
+Model comparison
+Model hosting
+Copilot feature matrix
+Keyboard shortcuts
+Copilot CLI reference
+CLI command reference
+CLI plugin reference
+CLI programmatic reference
+ACP server
+CLI configuration directory
+Custom agents configuration
+Custom instructions support
+Hooks reference
+Policy conflicts
+Supported surfaces for policies
+Managed settings reference
+Copilot allowlist reference
+MCP allowlist enforcement
+Metrics data
+Copilot billing
+Models and pricing
+Billing cycle
+Seat assignment
+License changes
+Azure billing
+Request-based billing (legacy)
+What changed with billing (legacy)
+Copilot requests (legacy)
+Billing overview (legacy)
+Monitor premium requests (legacy)
+Model multipliers for annual plans (legacy)
+Agentic audit log events
+Agent session filters
+Review excluded files
+Copilot usage metrics
+Copilot usage metrics data
+Interpret usage metrics
+Reconciling Copilot usage metrics
+Copilot LoC metrics
+Team-level metrics
+Example schema
+Tutorials
+All tutorials
+GitHub Copilot Cookbook
+All prompts
+Communicate effectively
+Create templates
+Summarize repository activity
+Synthesize research
+Create diagrams
+Generate tables
+Debug errors
+Debug invalid JSON
+Handle API rate limits
+Diagnose CI test failures
+Analyze functionality
+Explore implementations
+Analyze feedback
+Generate code
+Implement a feature
+Refactor code
+Improve code readability
+Fix lint errors
+Refactor for optimization
+Refactor for sustainability
+Refactor design patterns
+Refactor data access layers
+Decouple business logic
+Handle cross-cutting
+Simplify inheritance hierarchies
+Fix database deadlocks
+Translate code
+Document code
+File issues without breaking flow
+Document legacy code
+Explain legacy code
+Explain complex logic
+Sync documentation
+Write discussions or blog posts
+Testing code
+Generate unit tests
+Create mock objects
+Create end-to-end tests
+Update unit tests
+Analyze security
+Secure your repository
+Manage dependency updates
+Find vulnerabilities
+Customization library
+All customizations
+Custom instructions
+Your first custom instructions
+Concept explainer
+Debugging tutor
+Code reviewer
+GitHub Actions helper
+Pull request assistant
+Issue manager
+Accessibility auditor
+Testing automation
+Prompt files
+Your first prompt file
+Create README
+Onboarding plan
+Document API
+Review code
+Generate unit tests
+Custom agents
+Your first custom agent
+Implementation planner
+Bug fix teammate
+Cleanup specialist
+Cloud agent
+Get the best results
+Pilot cloud agent
+Improve a project
+Build guardrails
+Give access to resources
+Set up budgets
+Get started with budgets
+Optimize budget configuration
+Spark
+Your first spark
+Prompt tips
+Build and deploy apps
+Deploy from CLI
+Customize code review
+Enhance agent mode with MCP
+Compare AI models
+Speed up development work
+Roll out at scale
+Assign licenses
+Choose enterprise plan
+Set up self-serve licenses
+Track usage and adoption
+Remind inactive users
+Govern at scale
+Resources for approval
+Establish AI managers
+Govern for adoption
+Pilot a feature or model
+Maintain codebase standards
+Enable developers
+Drive adoption
+Integrate AI agents
+Drive downstream impact
+Achieve company goals
+Increase test coverage
+Accelerate pull requests
+Reduce security debt
+Measure trial success
+Explore a codebase
+Explore issues and discussions
+Explore pull requests
+Write tests
+Refactor code
+Optimize AI usage
+Optimize code reviews
+Reduce technical debt
+Review AI code
+Learn a new language
+Modernize legacy code
+Modernize Java applications
+Migrate a project
+Plan a project
+Vibe coding
+Upgrade projects
+Use hooks with Copilot CLI
+Use an AI SME
+Create CLI extensions
+Responsible use
+Chat
+Inline suggestions
+Agents
+GitHub Copilot
+How-tos
+Copilot CLI
+Customize Copilot CLI
+Add custom instructions
+Adding custom instructions for GitHub Copilot CLI
+Give Copilot additional context on how to understand your project and how to build, test and validate its changes.
+Copy as Markdown
+In this article
+Types of custom instructions
+Creating repository-wide custom instructions
+Creating path-specific custom instructions
+Custom instructions in use
+Further reading
+GitHub Copilot can provide responses that are tailored to your personal preferences, the way your team works, the tools you use, or the specifics of your project, if you provide it with enough context to do so. Instead of repeatedly adding this contextual detail to your prompts, you can create custom instructions that automatically add this information for you. The additional information is not displayed, but is available to Copilot to allow it to generate higher quality responses.
+Types of custom instructions
+GitHub Copilot CLI supports the following types of custom instructions.
+Repository-wide custom instructions
+These apply to all requests made in the context of a repository.
+These are specified in a copilot-instructions.md file in the .github directory at the root of the repository. See Creating repository-wide custom instructions.
+Path-specific custom instructions
+These apply to requests made in the context of files that match a specified path.
+These are specified in one or more NAME.instructions.md files within or below the .github/instructions directory at the root of the repository, or within or below a .github/instructions directory in the current working directory. See Creating path-specific custom instructions.
+If the path you specify in these instructions matches a file that Copilot is working on, and a repository-wide custom instructions file also exists, then the instructions from both files are used. You should avoid potential conflicts between instructions as Copilot's choice between conflicting instructions is non-deterministic.
+Agent instructions
+These are used by various AI agents.
+You can create one or more AGENTS.md files. These can be located in the repository's root directory, in the current working directory, or in any of the directories specified by a comma-separated list of paths in the COPILOT_CUSTOM_INSTRUCTIONS_DIRS environment variable.
+Instructions in the AGENTS.md file in the root directory, if found, are treated as primary instructions. If an AGENTS.md file and a .github/copilot-instructions.md file are both found at the root of the repository, the instructions in both files are used.
+Instructions found in other AGENTS.md files are treated as additional instructions. Any primary instructions that are found are likely to have more effect on Copilot's responses than additional instructions.
+For more information, see the agentsmd/agents.md repository.
+Alternatively, you can use CLAUDE.md and GEMINI.md files. These must be located at the root of the repository.
+Local instructions
+These apply within a specific local environment.
+You can specify instructions within your own home directory, by creating a file at $HOME/.copilot/copilot-instructions.md.
+You can also set the COPILOT_CUSTOM_INSTRUCTIONS_DIRS environment variable to a comma-separated list of directories. Copilot CLI will look for an AGENTS.md file, and any .github/instructions/**/*.instructions.md files, in each of these directories.
+Creating repository-wide custom instructions
+In the root of your repository, create a file named .github/copilot-instructions.md.
+Create the .github directory if it does not already exist.
+Add natural language instructions to the file, in Markdown format.
+Whitespace between instructions is ignored, so the instructions can be written as a single paragraph, each on a new line, or separated by blank lines for legibility.
+For help on writing effective custom instructions, see About customizing GitHub Copilot responses.
+Creating path-specific custom instructions
+Create the .github/instructions directory if it does not already exist.
+Optionally, create subdirectories of .github/instructions to organize your instruction files.
+Create one or more NAME.instructions.md files, where NAME indicates the purpose of the instructions. The file name must end with .instructions.md.
+At the start of the file, create a frontmatter block containing the applyTo keyword. Use glob syntax to specify what files or directories the instructions apply to.
+For example:
+--- applyTo: "app/models/**/*.rb" ---
+You can specify multiple patterns by separating them with commas. For example, to apply the instructions to all TypeScript files in the repository, you could use the following frontmatter block:
+--- applyTo: "**/*.ts,**/*.tsx" ---
+Glob examples:
+* - will all match all files in the current directory.
+** or **/* - will all match all files in all directories.
+*.py - will match all .py files in the current directory.
+**/*.py - will recursively match all .py files in all directories.
+src/*.py - will match all .py files in the src directory. For example, src/foo.py and src/bar.py but not src/foo/bar.py.
+src/**/*.py - will recursively match all .py files in the src directory. For example, src/foo.py, src/foo/bar.py, and src/foo/bar/baz.py.
+**/subdir/**/*.py - will recursively match all .py files in any subdir directory at any depth. For example, subdir/foo.py, subdir/nested/bar.py, parent/subdir/baz.py, and deep/parent/subdir/nested/qux.py, but not foo.py at a path that does not contain a subdir directory.
+Optionally, to prevent the file from being used by either Copilot cloud agent or Copilot code review, add the excludeAgent keyword to the frontmatter block. Use either "code-review" or "cloud-agent".
+For example, the following file will only be read by Copilot cloud agent.
+--- applyTo: "**" excludeAgent: "code-review" ---
+If the excludeAgent keyword is not included in the front matterblock, both Copilot code review and Copilot cloud agent will use your instructions.
+Add your custom instructions in natural language, using Markdown format. Whitespace between instructions is ignored, so the instructions can be written as a single paragraph, each on a new line, or separated by blank lines for legibility.
+Did you successfully add a custom instructions file to your repository?
+Yes No
+Custom instructions in use
+The instructions in the file(s) are available for use by Copilot as soon as you save the file(s). Instructions are automatically added to requests that you submit to Copilot.
+If you make changes to your custom instructions during a CLI session, your changes are available for use by Copilot the next time you submit a prompt in the current, or future, sessions.
+Further reading
+Support for different types of custom instructions
+Custom instructions—a curated collection of examples
+Using custom instructions to unlock the power of Copilot code review
+Help and support
+Did you find what you needed?
+Yes No
+Privacy policy
+Help us make these docs great!
+All GitHub docs are open source. See something that's wrong or unclear? Submit a pull request.
+Make a contribution
+Learn how to contribute
+Still need help?
+Ask the GitHub community
+Contact support
+Legal
+© 2026 GitHub, Inc.
+Terms
+Privacy
+Status
+Pricing
+Expert services
+Blog

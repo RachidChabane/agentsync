@@ -5,6 +5,16 @@ All notable changes to this project are documented here. Format follows
 
 ## [Unreleased]
 
+### Added
+- `spec_watch.py` + weekly CI cron: deterministic drift detection for the upstream
+  harness docs each adapter's format facts came from; changes open an issue with the
+  text diff.
+- PyPI publishing workflow (OIDC trusted publishing) on every GitHub release.
+
+### Fixed
+- `docs/ci.md` drift action: explicit `shell: bash` (pipefail) so `tee` can't swallow
+  verify's exit 1.
+
 ## [0.2.0]
 
 ### Added

@@ -79,6 +79,14 @@ deterministic where encodable, AI only where it isn't, and the boundary named.
 documentation: a generated artifact + a drift gate beats a doc someone must remember to
 update — exactly the "repeatable → deterministic" rule, dogfooded.
 
+### Upstream specs are watched, not remembered
+
+Adapters encode facts about other tools' file formats — facts that rot. `spec_watch.py`
+snapshots each adapter's primary-source doc pages (`docs/spec-sources.json` →
+`docs/spec-snapshots/`) and a weekly CI cron diffs them; a change opens an issue with
+the text diff. Detection is deterministic and token-free; only the judgment step (does
+this change affect an adapter?) involves a human or agent. Same split as everywhere else.
+
 ### Enforcement is layered, and honest about its limits
 
 | Layer | Mechanism | Guarantees |

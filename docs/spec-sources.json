@@ -1,0 +1,11 @@
+{
+  "_comment": "Primary-source docs each adapter's format facts came from. spec_watch.py diffs these against docs/spec-snapshots/ weekly (see .github/workflows/spec-watch.yml); a change opens an issue for the judgment step.",
+  "claude": ["https://code.claude.com/docs/en/mcp"],
+  "copilot": ["https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions"],
+  "opencode": ["https://opencode.ai/docs/config/", "https://opencode.ai/docs/rules/"],
+  "vscode": ["https://code.visualstudio.com/docs/agents/reference/mcp-configuration"],
+  "cursor": ["https://cursor.com/docs/mcp.md", "https://cursor.com/docs/rules.md"],
+  "windsurf": ["https://docs.windsurf.com/windsurf/cascade/mcp", "https://docs.windsurf.com/windsurf/cascade/memories"],
+  "zed": ["https://raw.githubusercontent.com/zed-industries/zed/main/docs/src/ai/mcp.md", "https://raw.githubusercontent.com/zed-industries/zed/main/docs/src/ai/rules.md"],
+  "cline": ["https://docs.cline.bot/mcp/configuring-mcp-servers", "https://docs.cline.bot/customization/cline-rules"]
+}

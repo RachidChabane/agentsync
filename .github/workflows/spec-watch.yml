@@ -1,0 +1,34 @@
+name: spec-watch
+
+# Deterministic layer of spec-sync: weekly diff of each harness's primary-source docs
+# against committed snapshots. Drift opens/updates one issue with the diff; the judgment
+# step (update the adapter, refresh the snapshot) is a human or agent reading that issue.
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Diff live specs against snapshots
+        id: watch
+        shell: bash
+        run: |
+          python3 -m core.spec_watch | tee watch.out || echo "drift=1" >> "$GITHUB_OUTPUT"
+      - name: Open or update the drift issue
+        if: steps.watch.outputs.drift == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          title="Harness spec drift detected"
+          body="$(printf 'spec-watch found upstream doc changes:\n\n```\n%s\n```\n\nJudge whether the affected adapter(s) need changes, then refresh with `python3 -m core.spec_watch --update`.\n' "$(cat watch.out)")"
+          n=$(gh issue list --state open --search "in:title \"$title\"" --json number --jq '.[0].number // empty')
+          if [ -n "$n" ]; then gh issue comment "$n" --body "$body"; else gh issue create --title "$title" --body "$body"; fi
