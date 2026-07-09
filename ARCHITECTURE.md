@@ -26,9 +26,10 @@ brings their own policy. Everything else below is downstream of this cut.
 ## Patterns applied (and where they earn their place)
 
 - **Adapter + Registry (Open/Closed).** Each harness implements a tiny interface
-  (`capabilities()`, `apply(ctx)`). `ADAPTERS` is a plain dict. Four real
-  implementations justify the abstraction; there is deliberately **no** plugin-discovery
-  DSL or dynamic loader — that would be speculative for four in-repo adapters.
+  (`capabilities()`, `apply(ctx)`). `ADAPTERS` is a plain dict. Eight real
+  implementations justify the abstraction (the four file-based ones share a
+  `FileHarness` base — paths + an MCP entry renderer); there is deliberately **no**
+  plugin-discovery DSL or dynamic loader — that would be speculative for in-repo adapters.
 - **Reconciliation loop (declarative IaC, à la Terraform/Ansible).** Each adapter
   describes *what it manages* as a list of `targets.py` objects (Link / Json / Merge /
   ClaudeMcp); the reconciler interprets that one description for **five verbs** — apply
@@ -98,7 +99,7 @@ Applying SOLID *where four implementations prove it* and skipping it elsewhere i
 judgment, not cargo-culting every pattern. Not built until the trigger fires:
 
 - **Plugin-discovery framework / dynamic adapter loading** — when an *external*
-  contributor or a 5th harness actually arrives.
+  (out-of-repo) adapter actually arrives.
 - **A grand unified config schema** across all four concerns — only MCP + enforcement
   diverge enough to warrant structure; the rest are files.
 - **Config schema-validation framework** — a small check is enough.

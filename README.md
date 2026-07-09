@@ -9,8 +9,8 @@ determinism-over-AI protocol that makes itself stick in every repo.**
 
 You configure your AI coding setup *once* — instructions, MCP servers, skill
 availability, enforcement — and `agentsync` renders it into each tool's native files
-(Claude Code, GitHub Copilot CLI, OpenCode, VS Code Copilot). It's LLM-agnostic,
-harness-agnostic, and token-efficient by design.
+(Claude Code, GitHub Copilot CLI, OpenCode, VS Code Copilot, Cursor, Windsurf, Zed,
+Cline). It's LLM-agnostic, harness-agnostic, and token-efficient by design.
 
 ```bash
 # one-liner
@@ -47,6 +47,16 @@ repo's `config/`):
 `verify --json` / `diff --json` emit machine-readable output (same exit codes) for CI
 gating — a copy-paste GitHub Action lives in [`docs/ci.md`](docs/ci.md).
 
+### Project scope (team-shared)
+
+`agentsync apply --project [DIR]` reads config from the repo's own `.agentsync/`
+(instructions.md, mcp.json, profile.json) and renders **committed** files teammates
+share: `CLAUDE.md` + `.mcp.json`, `.github/copilot-instructions.md`, `opencode.json`,
+`.vscode/mcp.json`, `AGENTS.md`, `.cursor/mcp.json`. Secrets stay out — remote-server
+auth renders as `${ENV_VAR}` headers, never this machine's values. `verify --project
+--json` in CI fails the PR when someone hand-edits a rendered file (see `docs/ci.md`).
+User-scope concerns (skills, hooks, inventory docs) deliberately stay in `$HOME`.
+
 ## What agentsync owns vs preserves
 
 agentsync edits *shared* config files (your `settings.json`) by **merge**: it owns a few
@@ -59,6 +69,10 @@ exactly what moves, and anything not listed below is yours to hand-edit freely.
 | Copilot | `disabledSkills`; the userPromptSubmitted + preToolUse hooks; `mcp-config.json` | everything else |
 | OpenCode | `opencode.json` keys `mcp`, `permission.skill`, `instructions` | every other key |
 | VS Code | the instructions block, `chat.useCustomAgentHooks`, its `chat.hookFilesLocations` + a dedicated `vscode-hooks.json` | everything else |
+| Cursor | `mcpServers` in `~/.cursor/mcp.json` (global rules are settings-UI-only — no file to manage) | every other key |
+| Windsurf | `global_rules.md`; `mcpServers` in `mcp_config.json` | every other key |
+| Zed | `~/.config/zed/AGENTS.md` (its MCP lives in JSONC `settings.json` — untouched) | everything else |
+| Cline | `Rules/agentsync.md`; `mcpServers` in `~/.cline/mcp.json` | every other key |
 
 Owned hooks are keyed by script name, so a stale entry left after the repo moves is
 replaced (not duplicated) and shows up in `verify`. Want to change an owned value? Edit
@@ -122,7 +136,12 @@ concerns:
 | Enforcement | hooks | hooks | JS plugin | own hooks file |
 
 Dashes are honest **graceful degradation**: VS Code exposes no MCP/skill surface, so the
-adapter declares it doesn't manage those (`capabilities()`) instead of faking it.
+adapter declares it doesn't manage those (`capabilities()`) instead of faking it. The
+same applies to the file-based harnesses (Cursor, Windsurf, Zed, Cline): instructions
+and/or MCP where the tool has a real file surface, nothing faked where it doesn't.
+
+Need tool-specific instruction text? Add `config/instructions.<harness>.md` — it's
+appended to the shared instructions for that harness only.
 
 ### 2. The determinism protocol (the reference feature)
 
@@ -150,7 +169,7 @@ calls (cheaper, predictable, testable):
 
 Different bets. [rulesync](https://github.com/dyoshikawa/rulesync) is *broad*: it
 generates and imports config across 30+ tools, one-shot. [mcpm](https://github.com/pathintegral-institute/mcpm)
-manages MCP servers only. agentsync is *narrow and stateful*: four harnesses, but a full
+manages MCP servers only. agentsync is *narrow and stateful*: eight harnesses, but a full
 reconciliation loop — `verify` (drift, exit 1), `diff` (preview), `uninstall` (surgical,
 `.bak` restore) — plus the determinism enforcement layer, none of which either offers.
 Pick agentsync when you want your AI config *controlled* (CI-gated drift, reversible
