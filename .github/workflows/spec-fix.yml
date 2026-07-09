@@ -1,0 +1,47 @@
+name: spec-fix
+
+# Judgment layer of spec-sync: when spec-watch opens a drift issue, a Claude agent reads
+# the diff, decides whether an adapter is affected, and opens a PR (gated by make verify).
+# Runs on a Claude Pro/Max SUBSCRIPTION, not API billing: generate the token once with
+# `claude setup-token` locally and store it as the CLAUDE_CODE_OAUTH_TOKEN repo secret.
+# Without the secret the job exits politely — the drift issue still stands for a human.
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  fix:
+    if: contains(github.event.issue.title, 'Harness spec drift')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require the subscription token
+        id: tok
+        env:
+          TOK: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          if [ -z "$TOK" ]; then
+            echo "skip=1" >> "$GITHUB_OUTPUT"
+            echo "No CLAUDE_CODE_OAUTH_TOKEN secret — leaving the issue for a human. (Enable: run 'claude setup-token' locally, add the repo secret.)"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.tok.outputs.skip != '1'
+      - uses: anthropics/claude-code-action@v1
+        if: steps.tok.outputs.skip != '1'
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Issue #${{ github.event.issue.number }} is a spec-watch drift report: an upstream
+            harness doc changed. Read the issue body's diff, then the affected adapter(s) in
+            core/adapters/ and ARCHITECTURE.md's per-harness notes.
+
+            Judge: does the doc change alter any file path, JSON key, or entry shape an
+            adapter encodes? If yes, update the adapter + its tests. Either way, refresh
+            snapshots with `python3 -m core.spec_watch --update`, run `make verify` (must
+            pass), and open a PR on a branch titled `spec-sync: <harness>` that closes the
+            issue, explaining in the body what changed upstream and why the adapter did or
+            didn't change. Comment your conclusion on the issue.
