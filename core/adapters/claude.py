@@ -4,7 +4,7 @@ file plus a ClaudeMcp target that imports it via the CLI."""
 from __future__ import annotations
 
 from . import Adapter
-from ..targets import ClaudeMcp, HookSpec, Json, Merge
+from ..targets import ClaudeMcp, File, HookSpec, Json, Merge
 from ..util import Ctx
 
 
@@ -21,7 +21,25 @@ class Claude(Adapter):
     name = "claude"
 
     def capabilities(self) -> set:
-        return {"instructions", "skills", "mcp", "enforcement"}
+        return {"instructions", "skills", "mcp", "enforcement", "project"}
+
+    def project_targets(self, ctx: Ctx) -> list:
+        # Committed, team-shared: CLAUDE.md + .mcp.json (Claude's project-MCP standard).
+        # Teammates get env-based headers, not this machine's headersHelper; enforcement
+        # stays user-scope — the $HOME hooks already gate every repo.
+        def entry(s):
+            if s["transport"] == "http":
+                out = {"type": "http", "url": s["url"]}
+                if "auth" in s and "env" in s["auth"]:
+                    out["headers"] = {s["auth"]["header"]: "${%s}" % s["auth"]["env"]}
+                return out
+            return {"type": "stdio", "command": s["command"], "args": s["args"], "env": {}}
+        return [
+            File(ctx.root / "CLAUDE.md", self._instructions_text(ctx), "instructions"),
+            Merge(ctx.root / ".mcp.json",
+                  owned=[(("mcpServers",), {n: entry(s) for n, s in ctx.servers.items()})],
+                  hooks=[], label="mcp"),
+        ]
 
     def targets(self, ctx: Ctx) -> list:
         base = ctx.root / ".claude"

@@ -64,6 +64,10 @@ def _installed(name: str, root: Path) -> bool:
         "copilot": [root / ".copilot", "copilot"],
         "opencode": [root / ".config/opencode", "opencode"],
         "vscode": [root / "Library/Application Support/Code", root / ".config/Code", "code"],
+        "cursor": [root / ".cursor", "cursor"],
+        "windsurf": [root / ".codeium/windsurf", "windsurf"],
+        "zed": [root / ".config/zed", "zed"],
+        "cline": [root / ".cline", root / "Documents/Cline", "cline"],
     }
     for p in probes.get(name, []):
         if isinstance(p, Path) and p.exists():

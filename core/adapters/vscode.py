@@ -17,7 +17,22 @@ class VSCode(Adapter):
     name = "vscode"
 
     def capabilities(self) -> set:
-        return {"instructions", "enforcement"}
+        return {"instructions", "enforcement", "project"}
+
+    def project_targets(self, ctx: Ctx) -> list:
+        # Project MCP only (.vscode/mcp.json, top-level key `servers` — VS Code's own
+        # dialect). Project instructions (.github/copilot-instructions.md) are owned by
+        # the copilot adapter — same file, one owner.
+        def entry(s):
+            if s["transport"] == "http":
+                out = {"type": "http", "url": s["url"]}
+                if "auth" in s and "env" in s["auth"]:
+                    out["headers"] = {s["auth"]["header"]: "${env:%s}" % s["auth"]["env"]}
+                return out
+            return {"type": "stdio", "command": s["command"], "args": s["args"]}
+        return [Merge(ctx.root / ".vscode" / "mcp.json",
+                      owned=[(("servers",), {n: entry(s) for n, s in ctx.servers.items()})],
+                      hooks=[], label="mcp")]
 
     def targets(self, ctx: Ctx) -> list:
         text = self._instructions_text(ctx)

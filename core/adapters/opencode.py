@@ -23,7 +23,19 @@ class OpenCode(Adapter):
     name = "opencode"
 
     def capabilities(self) -> set:
-        return {"instructions", "skills", "mcp", "enforcement"}
+        return {"instructions", "skills", "mcp", "enforcement", "project"}
+
+    def project_targets(self, ctx: Ctx) -> list:
+        # opencode.json at repo root; instructions as repo-relative paths so the file
+        # works on every teammate's checkout.
+        import os
+        ins = [os.path.relpath(ctx.instructions, ctx.root)]
+        if (v := self._variant(ctx)):
+            ins.append(os.path.relpath(v, ctx.root))
+        return [Merge(ctx.root / "opencode.json",
+                      owned=[(("mcp",), {n: mcp_entry(s) for n, s in ctx.servers.items()}),
+                             (("instructions",), ins)],
+                      hooks=[], label="config")]
 
     def targets(self, ctx: Ctx) -> list:
         base = ctx.root / ".config" / "opencode"

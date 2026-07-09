@@ -20,6 +20,7 @@ verify:  ## syntax-check all sources + run the test suite (no writes to $HOME)
 	@bash tests/test_runner.sh
 	@bash tests/test_scaffold.sh
 	@python3 tests/test_apply.py
+	@python3 tests/test_project.py
 	@python3 tests/test_lifecycle.py
 	@python3 tests/test_skills.py
 	@python3 tests/test_docs.py

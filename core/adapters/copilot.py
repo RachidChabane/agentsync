@@ -21,7 +21,14 @@ class Copilot(Adapter):
     name = "copilot"
 
     def capabilities(self) -> set:
-        return {"instructions", "skills", "mcp", "enforcement"}
+        return {"instructions", "skills", "mcp", "enforcement", "project"}
+
+    def project_targets(self, ctx: Ctx) -> list:
+        # .github/copilot-instructions.md is read by both Copilot CLI and VS Code Copilot,
+        # so it's owned here once (the vscode adapter contributes project MCP instead).
+        from ..targets import File
+        return [File(ctx.root / ".github" / "copilot-instructions.md",
+                     self._instructions_text(ctx), "instructions")]
 
     def targets(self, ctx: Ctx) -> list:
         base = ctx.root / ".copilot"

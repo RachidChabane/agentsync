@@ -15,6 +15,10 @@ add() { detected+=("$1"); echo "  $1"; }
 { [ -d "$HOME/.config/opencode" ] || have opencode; } && add opencode || true
 { [ -d "$HOME/Library/Application Support/Code" ] || [ -d "$HOME/.config/Code" ] || have code; } \
   && add vscode || true
+{ [ -d "$HOME/.cursor" ]           || have cursor;   } && add cursor   || true
+{ [ -d "$HOME/.codeium/windsurf" ] || have windsurf; } && add windsurf || true
+{ [ -d "$HOME/.config/zed" ]       || have zed;      } && add zed      || true
+{ [ -d "$HOME/.cline" ] || [ -d "$HOME/Documents/Cline" ] || have cline; } && add cline || true
 [ ${#detected[@]} -gt 0 ] || echo "  none detected — edit config/profile.json by hand"
 
 echo "== Config =="

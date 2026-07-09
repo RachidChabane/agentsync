@@ -70,21 +70,38 @@ class FileHarness(Adapter):
         raise NotImplementedError
 
     def capabilities(self) -> set:
-        return {"instructions"} | ({"mcp"} if self.mcp_path else set())
+        return ({"instructions"} if self.instructions_path else set()) \
+            | ({"mcp"} if self.mcp_path else set()) | {"project"}
 
     def targets(self, ctx: Ctx) -> list:
-        from ..targets import Json
-        out = [self._instructions(ctx, ctx.root / self.instructions_path)]
+        out: list = [self._instructions(ctx, ctx.root / self.instructions_path)] \
+            if self.instructions_path else []
         if self.mcp_path:
-            out.append(Json(ctx.root / self.mcp_path,
-                            {self.mcp_key: {n: self.mcp_entry(s) for n, s in ctx.servers.items()}},
-                            "mcp"))
+            out.append(self._mcp_merge(ctx, ctx.root / self.mcp_path))
         return out
+
+    def _mcp_merge(self, ctx: Ctx, path):
+        """Own only the servers key in the harness's (user-shared) MCP file."""
+        from ..targets import Merge
+        servers = {n: self.mcp_entry(s) for n, s in ctx.servers.items()}
+        return Merge(path, owned=[((self.mcp_key,), servers)], hooks=[], label="mcp")
+
+    def project_targets(self, ctx: Ctx) -> list:
+        # All FileHarness tools read a repo-root AGENTS.md (the open standard). Shared
+        # base text only — several adapters may own this one file, so no per-harness
+        # variants here (they'd fight over the content).
+        from ..targets import File
+        return [File(ctx.root / "AGENTS.md", ctx.instructions.read_text(), "instructions")]
 
 
 from .claude import Claude          # noqa: E402
+from .cline import Cline            # noqa: E402
 from .copilot import Copilot        # noqa: E402
+from .cursor import Cursor          # noqa: E402
 from .opencode import OpenCode      # noqa: E402
 from .vscode import VSCode          # noqa: E402
+from .windsurf import Windsurf      # noqa: E402
+from .zed import Zed                # noqa: E402
 
-ADAPTERS = {a.name: a for a in (Claude(), Copilot(), OpenCode(), VSCode())}
+ADAPTERS = {a.name: a for a in (Claude(), Copilot(), OpenCode(), VSCode(),
+                                Cursor(), Windsurf(), Zed(), Cline())}

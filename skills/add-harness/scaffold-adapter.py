@@ -64,9 +64,9 @@ def main():
     path.write_text(TEMPLATE.format(Cls=cls, name=name))
 
     # Register: add the import after the last adapter import, and into ADAPTERS.
-    text = re.sub(r"(from \.vscode import VSCode\s+# noqa: E402\n)",
+    text = re.sub(r"(from \.zed import Zed\s+# noqa: E402\n)",
                   rf"\1from .{name} import {cls}          # noqa: E402\n", text, count=1)
-    text = text.replace("VSCode())}", f"VSCode(), {cls}())}}")
+    text = text.replace("Cline())}", f"Cline(), {cls}())}}")
     INIT.write_text(text)
 
     print(f"created {path.relative_to(REPO)} and registered {cls} in {INIT.name}\n")
