@@ -5,6 +5,8 @@ All notable changes to this project are documented here. Format follows
 
 ## [Unreleased]
 
+## [0.2.0]
+
 ### Added
 - `verify --json` / `diff --json` — machine-readable reports (same exit codes) for CI
   drift gating, plus a copy-paste GitHub Action in `docs/ci.md`.
