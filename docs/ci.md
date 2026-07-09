@@ -27,6 +27,7 @@ jobs:
           repository: RachidChabane/agentsync
           path: agentsync-engine
       - name: Fail on drift
+        shell: bash  # explicit bash = pipefail, so tee can't swallow verify's exit 1
         run: |
           python3 -m core.agentsync verify --json \
             --project "$GITHUB_WORKSPACE" | tee drift.json
