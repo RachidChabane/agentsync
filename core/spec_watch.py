@@ -58,7 +58,10 @@ def normalize(raw: str) -> str:
         p.feed(raw)
         raw = "".join(p.parts)
     lines = [re.sub(r"\s+", " ", ln).strip() for ln in raw.splitlines()]
-    return "\n".join(ln for ln in lines if ln) + "\n"
+    # drop volatile footer noise ("Last updated: <date>") — it fires false drift on
+    # every docs redeploy without saying anything about the format
+    return "\n".join(ln for ln in lines
+                     if ln and not re.match(r"(?i)last updated\b", ln)) + "\n"
 
 
 def _fetch(url: str) -> str:

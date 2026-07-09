@@ -22,8 +22,8 @@ def main(tmp=None):
     assert "bad()" not in text and "x{}" not in text, "script/style leaked"
     assert "MCP\n" in text and "Use mcpServers in config." in text, text
     assert spec_watch.normalize(HTML) == text, "not deterministic"
-    md = spec_watch.normalize("# Title\n\nplain  markdown\n")
-    assert md == "# Title\nplain markdown\n", md
+    md = spec_watch.normalize("# Title\n\nplain  markdown\nLast updated: Jul 9, 2026\n")
+    assert md == "# Title\nplain markdown\n", md  # volatile footer stripped
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)

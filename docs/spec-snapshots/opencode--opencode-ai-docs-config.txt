@@ -704,4 +704,3 @@ Including large instruction files without cluttering your config.
 Sharing common configuration snippets across multiple config files.
 Edit pageFound a bug? Open an issueJoin our Discord community Select language EnglishالعربيةBosanskiDanskDeutschEspañolFrançaisItaliano日本語한국어Norsk BokmålPolskiPortuguês (Brasil)РусскийไทยTürkçe简体中文繁體中文
 © Anomaly
-Last updated: Jul 8, 2026
