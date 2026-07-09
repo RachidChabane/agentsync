@@ -4,7 +4,7 @@ file plus a ClaudeMcp target that imports it via the CLI."""
 from __future__ import annotations
 
 from . import Adapter
-from ..targets import ClaudeMcp, HookSpec, Json, Link, Merge
+from ..targets import ClaudeMcp, HookSpec, Json, Merge
 from ..util import Ctx
 
 
@@ -31,7 +31,7 @@ class Claude(Adapter):
         guard = str(ctx.enforce_dir / "guard-commit.sh")
         extra_owned, extra_hooks = self._passthrough(ctx)
         return [
-            Link(base / "CLAUDE.md", ctx.instructions, "instructions"),
+            self._instructions(ctx, base / "CLAUDE.md"),
             Json(base / "mcp-servers.json", servers, "mcp"),
             Merge(base / "settings.json",
                   owned=[(("skillOverrides",), overrides)] + extra_owned,

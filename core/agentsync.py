@@ -127,7 +127,11 @@ def doctor(ctx: Ctx, wanted: list) -> int:
 
 def run_adapter(adapter, ctx: Ctx, no_mcp_import: bool) -> Report:
     rep = Report(adapter.name)
-    for t in adapter.targets(ctx):
+    tgts = adapter.project_targets(ctx) if ctx.scope == "project" else adapter.targets(ctx)
+    if ctx.scope == "project" and not tgts:
+        rep.skipped("no project-scope surface")
+        return rep
+    for t in tgts:
         if no_mcp_import and isinstance(t, ClaudeMcp):
             continue
         t.process(ctx, rep)
@@ -144,25 +148,40 @@ def main(argv=None) -> int:
     ap.add_argument("--no-mcp-import", action="store_true", help="skip the Claude MCP CLI import")
     ap.add_argument("--json", action="store_true",
                     help="machine-readable output (verify/diff only); exit codes unchanged")
+    ap.add_argument("--project", nargs="?", const=".", metavar="DIR",
+                    help="project scope: render committed, team-shared files into this "
+                         "repo (config read from DIR/.agentsync)")
     args = ap.parse_args(argv)
     if args.json and args.command not in ("verify", "diff"):
         ap.error("--json is only supported with verify and diff")
+    if args.project and args.command in ("doctor", "docs"):
+        ap.error(f"--project is not supported with {args.command}")
 
-    config_dir = resolve_config(args.config, REPO)
+    proj = Path(args.project).expanduser().resolve() if args.project else None
+    if proj:
+        config_dir = Path(args.config).expanduser() if args.config else proj / ".agentsync"
+        if not config_dir.is_dir():
+            sys.exit(f"error: {config_dir} not found — create it (instructions.md, mcp.json, "
+                     "profile.json) to make this repo agentsync-managed")
+    else:
+        config_dir = resolve_config(args.config, REPO)
     profile, skills_cfg, servers, overrides = load_config(config_dir)
 
-    root = Path(args.root).expanduser() if args.root else \
+    root = proj if proj else \
+        Path(args.root).expanduser() if args.root else \
         Path(profile["root"]).expanduser() if profile.get("root") else Path.home()
     wanted = args.harness or profile.get("harnesses", list(ADAPTERS))
     unknown = [h for h in wanted if h not in ADAPTERS]
     if unknown:
         sys.exit(f"unknown harness(es): {', '.join(unknown)} (known: {', '.join(ADAPTERS)})")
     norm = skillmod.normalize(skills_cfg)
-    skill_paths = skillmod.resolve(norm, root / ".cache/agentsync/skills",
-                                   do_fetch=(args.command == "apply"))
+    # Skills are user-scope (symlinked into $HOME harness dirs) — not fetched per repo.
+    skill_paths = {} if proj else \
+        skillmod.resolve(norm, root / ".cache/agentsync/skills", do_fetch=(args.command == "apply"))
     ctx = Ctx(repo=REPO, root=root, config=config_dir, instructions=config_dir / "instructions.md",
               skills=skillmod.tiers(norm), servers=servers, profile=profile,
-              verb=args.command, skill_paths=skill_paths, overrides=overrides)
+              verb=args.command, scope="project" if proj else "user",
+              skill_paths=skill_paths, overrides=overrides)
 
     if args.command == "doctor":
         return doctor(ctx, wanted)
@@ -177,7 +196,7 @@ def main(argv=None) -> int:
     reports = [run_adapter(ADAPTERS[h], ctx, args.no_mcp_import) for h in wanted]
     drift = any(rep.drift for rep in reports)
     doc_drift = False
-    if args.command == "verify":
+    if args.command == "verify" and ctx.scope == "user":  # inventory docs are user-scope
         _, doc_drift = gen_docs.generate(ctx, write=False)
         drift = drift or doc_drift
 
@@ -204,7 +223,7 @@ def main(argv=None) -> int:
     print()
 
     # Inventory docs: regenerate on apply, drift-check on verify (kept automatically fresh).
-    if args.command == "apply":
+    if args.command == "apply" and ctx.scope == "user":
         changed, _ = gen_docs.generate(ctx, write=True)
         if changed:
             print(f"[docs] regenerated: {', '.join(changed)}")

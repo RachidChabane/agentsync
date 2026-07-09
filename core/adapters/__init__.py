@@ -15,11 +15,35 @@ class Adapter:
     name = ""
 
     def capabilities(self) -> set:
-        """Subset of {"instructions", "skills", "mcp", "enforcement"}."""
+        """Subset of {"instructions", "skills", "mcp", "enforcement", "project"}."""
         return set()
 
     def targets(self, ctx: Ctx) -> list:
         raise NotImplementedError
+
+    def project_targets(self, ctx: Ctx) -> list:
+        """Targets rendered into a repo (`--project`): committed files a team shares.
+        Empty = the harness has no project-scope surface (graceful degradation)."""
+        return []
+
+    def _variant(self, ctx: Ctx):
+        """Optional per-harness instruction variant: config/instructions.<name>.md is
+        appended to the shared instructions for this harness only."""
+        p = ctx.config / f"instructions.{self.name}.md"
+        return p if p.exists() else None
+
+    def _instructions_text(self, ctx: Ctx) -> str:
+        var = self._variant(ctx)
+        base = ctx.instructions.read_text()
+        return base.rstrip() + "\n\n" + var.read_text() if var else base
+
+    def _instructions(self, ctx: Ctx, dest):
+        """Symlink the shared instructions — or, when a variant exists, own a rendered
+        base+variant file (a symlink can't express the concatenation)."""
+        from ..targets import File, Link
+        if self._variant(ctx):
+            return File(dest, self._instructions_text(ctx), "instructions")
+        return Link(dest, ctx.instructions, "instructions")
 
     def _passthrough(self, ctx: Ctx):
         """User's arbitrary settings for this harness (config/overrides.json): scalar/
@@ -32,6 +56,30 @@ class Adapter:
         from ..targets import Link
         return [Link(skills_dir / name, p, f"skill:{name}")
                 for name, p in ctx.skill_paths.items() if p]
+
+
+class FileHarness(Adapter):
+    """Generic base for the common harness shape: one instructions file + one MCP JSON,
+    no hook/skill surface. A subclass is just paths + an MCP entry renderer (~10 lines);
+    leave `mcp_path` empty for instructions-only harnesses."""
+    instructions_path = ""  # relative to root
+    mcp_path = ""           # relative to root; "" = no MCP surface
+    mcp_key = "mcpServers"  # top-level key in the MCP file
+
+    def mcp_entry(self, s: dict) -> dict:
+        raise NotImplementedError
+
+    def capabilities(self) -> set:
+        return {"instructions"} | ({"mcp"} if self.mcp_path else set())
+
+    def targets(self, ctx: Ctx) -> list:
+        from ..targets import Json
+        out = [self._instructions(ctx, ctx.root / self.instructions_path)]
+        if self.mcp_path:
+            out.append(Json(ctx.root / self.mcp_path,
+                            {self.mcp_key: {n: self.mcp_entry(s) for n, s in ctx.servers.items()}},
+                            "mcp"))
+        return out
 
 
 from .claude import Claude          # noqa: E402

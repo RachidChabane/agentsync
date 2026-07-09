@@ -89,13 +89,14 @@ class Link(Target):
         rep.linked(f"{self.label}: {self.path} -> {want}")
 
 
-class Json(Target):
-    """A file agentsync owns wholesale (e.g. an MCP artifact)."""
-    def __init__(self, path: Path, obj, label: str):
-        self.path, self.obj, self.label = path, obj, label
+class File(Target):
+    """A text file agentsync owns wholesale (e.g. rendered instruction variants,
+    project-scope instruction files)."""
+    def __init__(self, path: Path, content: str, label: str):
+        self.path, self.content, self.label = path, content, label
 
     def process(self, ctx, rep):
-        new = dump(self.obj)
+        new = self.content
         cur = self.path.read_text() if self.path.exists() and not self.path.is_symlink() else None
         if ctx.verb == "uninstall":
             if self.path.exists():
@@ -118,6 +119,13 @@ class Json(Target):
             self.path.unlink()
         self.path.write_text(new)
         rep.wrote(f"{self.label}: {self.path}")
+
+
+class Json(File):
+    """A JSON file agentsync owns wholesale (e.g. an MCP artifact)."""
+    def __init__(self, path: Path, obj, label: str):
+        super().__init__(path, dump(obj), label)
+        self.obj = obj  # kept for introspection (gen_docs reads hook-file targets)
 
 
 class HookSpec:

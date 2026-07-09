@@ -100,6 +100,7 @@ def main():
         assert "db" not in json.loads((root / ".claude/mcp-servers.json").read_text())
 
     enforcement_off()
+    instruction_variants()
     print("\ntest_apply: PASS")
 
 
@@ -127,6 +128,30 @@ def enforcement_off():
         assert (root / ".claude/CLAUDE.md").is_symlink()
         assert (root / ".claude/mcp-servers.json").exists()
         assert agentsync.main(["verify", *common]) == 0, "verify dirty after apply"
+
+
+def instruction_variants():
+    """config/instructions.<harness>.md is appended for that harness only: a rendered
+    file where the harness reads one path, an extra list entry for OpenCode."""
+    with tempfile.TemporaryDirectory() as tmp:
+        root, cfg = Path(tmp) / "home", Path(tmp) / "cfg"
+        write_config(cfg)
+        (cfg / "instructions.claude.md").write_text("## Claude-only\nuse rtk\n")
+        common = ["--root", str(root), "--config", str(cfg), "--no-mcp-import"]
+        assert agentsync.main(["apply", *common]) == 0
+
+        cm = root / ".claude/CLAUDE.md"
+        assert not cm.is_symlink() and cm.read_text().startswith("# Global"), "variant not rendered"
+        assert "## Claude-only" in cm.read_text(), "variant not appended"
+        assert (root / ".copilot/copilot-instructions.md").is_symlink(), \
+            "harness without a variant must keep the symlink"
+        assert agentsync.main(["verify", *common]) == 0, "verify dirty after apply"
+
+        (cfg / "instructions.opencode.md").write_text("## OC-only\n")
+        assert agentsync.main(["verify", *common]) == 1, "new variant not seen as drift"
+        assert agentsync.main(["apply", *common]) == 0
+        oc = json.loads((root / ".config/opencode/opencode.json").read_text())
+        assert str(cfg / "instructions.opencode.md") in oc["instructions"], oc["instructions"]
 
 
 if __name__ == "__main__":

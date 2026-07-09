@@ -35,7 +35,8 @@ class OpenCode(Adapter):
             Merge(base / "opencode.json",
                   owned=[(("mcp",), servers),
                          (("permission", "skill"), skill_perms),
-                         (("instructions",), [str(ctx.instructions)])] + extra_owned,
+                         (("instructions",), [str(ctx.instructions)]
+                          + ([str(v)] if (v := self._variant(ctx)) else []))] + extra_owned,
                   hooks=[], extra_hooks=extra_hooks, label="config"),
             *([Link(base / "plugin" / "determinism.js",
                     ctx.enforce_dir / "opencode-plugin.js", "plugin")]

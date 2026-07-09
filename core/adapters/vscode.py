@@ -20,7 +20,7 @@ class VSCode(Adapter):
         return {"instructions", "enforcement"}
 
     def targets(self, ctx: Ctx) -> list:
-        text = ctx.instructions.read_text()
+        text = self._instructions_text(ctx)
         ov = dict(ctx.overrides.get("vscode", {}))
         user_hookloc = ov.pop("chat.hookFilesLocations", {})  # user's extra (workspace) locations
         user_hooks = ov.pop("hooks", {})                      # user's VS Code hooks (e.g. rtk copilot)
