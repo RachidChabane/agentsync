@@ -24,6 +24,8 @@ def main():
         (cfg / "mcp.json").write_text('{"servers":{"context7":{"transport":"http","url":"https://mcp.context7.com/mcp"}}}')
         (cfg / "skills.json").write_text(json.dumps({"skills": {"myskill": {"tier": "name-only", "source": str(skill)}}}))
         (cfg / "profile.json").write_text('{"harnesses":["claude"]}')
+        # top-level "_comment" (as config.example ships) must not crash the agents scan
+        (cfg / "overrides.json").write_text('{"_comment": "note", "claude": {}}')
         common = ["--root", str(root), "--config", str(cfg)]
 
         assert agentsync.main(["docs", *common]) == 0

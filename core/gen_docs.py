@@ -144,6 +144,8 @@ def _hooks(ctx: Ctx) -> str:
 def _agent_dirs(ctx: Ctx):
     dirs = [Path.home() / ".claude" / "agents"]
     for ov in ctx.overrides.values():
+        if not isinstance(ov, dict):  # e.g. the top-level "_comment" string
+            continue
         for key in ("chat.agentFilesLocations", "chat.modeFilesLocations"):
             for p in (ov.get(key) or {}):
                 dirs.append(Path(p).expanduser())
