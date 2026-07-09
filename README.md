@@ -16,6 +16,9 @@ harness-agnostic, and token-efficient by design.
 # one-liner
 curl -fsSL https://raw.githubusercontent.com/RachidChabane/agentsync/main/install.sh | bash
 
+# or without cloning (CLI only; put your config in ~/.config/agentsync)
+pipx install git+https://github.com/RachidChabane/agentsync   # or uvx --from git+... agentsync
+
 # or by hand
 git clone https://github.com/RachidChabane/agentsync && cd agentsync
 ./init.sh          # detects your harnesses, creates config/, installs the CLIs
@@ -41,6 +44,8 @@ repo's `config/`):
 | `agentsync docs` | regenerate the inventory docs (also runs automatically on every `apply`) |
 
 `--root DIR` targets a sandbox instead of `$HOME`; `--harness NAME` limits scope.
+`verify --json` / `diff --json` emit machine-readable output (same exit codes) for CI
+gating — a copy-paste GitHub Action lives in [`docs/ci.md`](docs/ci.md).
 
 ## What agentsync owns vs preserves
 
@@ -72,9 +77,11 @@ and a deterministic renderer, so:
 - a read-only `verify` proves no tool has drifted;
 - the same config reproduces on a fresh machine in one command.
 
-It ships with a second, opt-in idea baked in as the reference feature: the
-**determinism protocol** — *if a repeatable task can be made deterministic, it should
-be; use AI only for work that needs judgment that can't be encoded.* See below.
+It ships with a second idea baked in as the reference feature: the **determinism
+protocol** — *if a repeatable task can be made deterministic, it should be; use AI only
+for work that needs judgment that can't be encoded.* It's on by default and genuinely
+optional: set `"enforcement": false` in `config/profile.json` for config-sync only. See
+below.
 
 ---
 
@@ -128,7 +135,8 @@ calls (cheaper, predictable, testable):
   npm. The verbs are the standard; the runner is just a binding.
 - **Adoption** — `scaffold-determinism` drops a front door (default: a `Makefile`) with
   the standard verbs into any repo, in one command.
-- **Enforcement** (wired by `agentsync apply`, per harness):
+- **Enforcement** (wired by `agentsync apply`, per harness; skip it all with
+  `"enforcement": false` in `profile.json`):
   - a **session nudge** surfaces the repo's tasks (or tells the agent to scaffold);
   - a **commit gate** runs the repo's fast `verify` before any agent `git commit` and
     blocks on failure. It **fails open** — no runner, no `verify` verb, or a timeout all
@@ -137,6 +145,21 @@ calls (cheaper, predictable, testable):
 `verify` is the fast, read-only, commit-safe verb; slow suites go under `test`.
 
 ---
+
+## vs. rulesync / mcpm
+
+Different bets. [rulesync](https://github.com/dyoshikawa/rulesync) is *broad*: it
+generates and imports config across 30+ tools, one-shot. [mcpm](https://github.com/pathintegral-institute/mcpm)
+manages MCP servers only. agentsync is *narrow and stateful*: four harnesses, but a full
+reconciliation loop — `verify` (drift, exit 1), `diff` (preview), `uninstall` (surgical,
+`.bak` restore) — plus the determinism enforcement layer, none of which either offers.
+Pick agentsync when you want your AI config *controlled* (CI-gated drift, reversible
+installs), not just generated.
+
+No import converter, on purpose: agentsync's sources are already the open formats —
+instructions are plain markdown (AGENTS.md-style), skills are standard
+[Agent Skills](https://code.claude.com/docs/en/skills) (`SKILL.md`) directories linked
+as-is — so existing files drop in, and rulesync can convert the exotic ones.
 
 ## Requirements
 

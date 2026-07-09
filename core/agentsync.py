@@ -30,6 +30,21 @@ REPO = Path(__file__).resolve().parents[1]
 ICON = {"ok": "·", "write": "✎", "link": "→", "skip": "–", "remove": "✗", "drift": "Δ"}
 
 
+def resolve_config(arg: str | None, repo: Path) -> Path:
+    """--config wins; else the repo's config/, else config.example/, else the user-scope
+    dir (~/.config/agentsync) so a pipx/uvx install works without a checkout."""
+    if arg:
+        return Path(arg).expanduser()
+    for cand in (repo / "config", repo / "config.example"):
+        if cand.exists():
+            return cand
+    fallback = Path.home() / ".config" / "agentsync"
+    if fallback.exists():
+        return fallback
+    sys.exit(f"error: no config found — create {fallback} (see config.example/ in the "
+             "repo) or pass --config DIR")
+
+
 def load_config(config_dir: Path):
     def jload(name):
         p = config_dir / name
@@ -127,10 +142,13 @@ def main(argv=None) -> int:
     ap.add_argument("--config", help="config dir (default: ./config, else ./config.example)")
     ap.add_argument("--harness", action="append", help="limit to these harnesses (repeatable)")
     ap.add_argument("--no-mcp-import", action="store_true", help="skip the Claude MCP CLI import")
+    ap.add_argument("--json", action="store_true",
+                    help="machine-readable output (verify/diff only); exit codes unchanged")
     args = ap.parse_args(argv)
+    if args.json and args.command not in ("verify", "diff"):
+        ap.error("--json is only supported with verify and diff")
 
-    config_dir = Path(args.config) if args.config else (
-        REPO / "config" if (REPO / "config").exists() else REPO / "config.example")
+    config_dir = resolve_config(args.config, REPO)
     profile, skills_cfg, servers, overrides = load_config(config_dir)
 
     root = Path(args.root).expanduser() if args.root else \
@@ -154,15 +172,30 @@ def main(argv=None) -> int:
               f"({ctx.config / 'docs'})")
         return 0
 
-    print(f"{args.command}: config={config_dir.name} root={root} harnesses={','.join(wanted)}\n")
+    if not args.json:
+        print(f"{args.command}: config={config_dir.name} root={root} harnesses={','.join(wanted)}\n")
     reports = [run_adapter(ADAPTERS[h], ctx, args.no_mcp_import) for h in wanted]
+    drift = any(rep.drift for rep in reports)
+    doc_drift = False
+    if args.command == "verify":
+        _, doc_drift = gen_docs.generate(ctx, write=False)
+        drift = drift or doc_drift
 
-    drift = False
+    # Machine-readable output for CI gating: same data, same exit codes, no prose.
+    if args.json:
+        print(json.dumps({
+            "command": args.command, "config": str(config_dir), "root": str(root),
+            "drift": drift, "docs_drift": doc_drift,
+            "harnesses": [{"name": rep.name, "drift": rep.drift,
+                           "lines": [{"status": s, "message": m} for s, m in rep.lines],
+                           "diffs": rep.diffs} for rep in reports],
+        }, indent=2))
+        return 1 if args.command == "verify" and drift else 0
+
     for rep in reports:
         print(f"[{rep.name}]")
         for status, msg in rep.lines:
             print(f"  {ICON.get(status, '?')} {msg}")
-        drift = drift or rep.drift
     if args.command == "diff":
         blocks = [b for rep in reports for b in rep.diffs]
         if blocks:
@@ -175,11 +208,8 @@ def main(argv=None) -> int:
         changed, _ = gen_docs.generate(ctx, write=True)
         if changed:
             print(f"[docs] regenerated: {', '.join(changed)}")
-    elif args.command == "verify":
-        _, doc_drift = gen_docs.generate(ctx, write=False)
-        if doc_drift:
-            drift = True
-            print("[docs] out of date — run `apply` (or `agentsync docs`)")
+    elif doc_drift:
+        print("[docs] out of date — run `apply` (or `agentsync docs`)")
 
     if args.command == "verify":
         print("DRIFT — run `apply` to converge." if drift else "ok: all harnesses match config.")

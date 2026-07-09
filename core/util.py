@@ -34,6 +34,12 @@ class Ctx:
     def enforce_dir(self) -> Path:
         return self.repo / "core" / "enforcement"
 
+    @property
+    def enforcement(self) -> bool:
+        """Determinism-protocol enforcement (gate + nudge/plugin) is opt-out via
+        profile.json {"enforcement": false} — config sync alone stays available."""
+        return bool(self.profile.get("enforcement", True))
+
 
 @dataclass
 class Report:

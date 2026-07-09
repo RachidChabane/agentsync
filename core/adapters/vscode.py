@@ -33,7 +33,7 @@ class VSCode(Adapter):
         vscode_hooks = {"hooks": {
             "SessionStart": [{"hooks": [{"type": "command", "command": f'"{nudge}"'}]}],
             "PreToolUse": [{"hooks": [{"type": "command", "command": f'"{guard}"'}]}],
-        }}
+        } if ctx.enforcement else {}}  # file still carries the user's own VS Code hooks
         for ev, groups in user_hooks.items():                 # merge user hooks (rtk copilot) in
             vscode_hooks["hooks"].setdefault(ev, []).extend(groups)
 

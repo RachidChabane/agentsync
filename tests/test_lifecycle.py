@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Lifecycle checks (slice A): backup-on-merge, stale-hook cleanup + drift visibility,
-`diff` writes nothing, and uninstall surgically removes only what we added. Sandbox root;
-never touches $HOME. Run from repo root.
+`diff` writes nothing, `--json` output for CI, and uninstall surgically removes only what
+we added. Sandbox root; never touches $HOME. Run from repo root.
 """
+import contextlib
+import io
 import json
 import sys
 import tempfile
@@ -19,6 +21,14 @@ def write_cfg(d: Path):
     (d / "mcp.json").write_text('{"servers":{"context7":{"transport":"http","url":"https://mcp.context7.com/mcp"}}}')
     (d / "skills.json").write_text('{"skills":{"a":"on","b":"user-invocable-only"}}')
     (d / "profile.json").write_text('{"harnesses":["claude","copilot","opencode"]}')
+
+
+def run_json(argv):
+    """Run the CLI capturing stdout; returns (exit_code, parsed JSON)."""
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        rc = agentsync.main(argv)
+    return rc, json.loads(buf.getvalue())
 
 
 def guards(settings: dict):
@@ -64,6 +74,22 @@ def main():
         assert cs.read_text() == before, "diff wrote to disk!"
         agentsync.main(["apply", *common])  # reconverge
 
+        # J: --json is valid JSON, mirrors drift + exit code, and carries diff blocks.
+        rc, out = run_json(["verify", "--json", *common])
+        assert rc == 0 and out["drift"] is False, out
+        assert {h["name"] for h in out["harnesses"]} == {"claude", "copilot", "opencode"}
+        data = json.loads(cs.read_text())
+        data["hooks"]["SessionStart"] = []
+        cs.write_text(json.dumps(data))
+        rc, out = run_json(["verify", "--json", *common])
+        assert rc == 1 and out["drift"] is True, "json verify missed drift"
+        claude = next(h for h in out["harnesses"] if h["name"] == "claude")
+        assert claude["drift"] and any(l["status"] == "drift" for l in claude["lines"])
+        rc, out = run_json(["diff", "--json", *common])
+        assert rc == 0, "diff --json must keep diff's exit code"
+        assert any(h["diffs"] for h in out["harnesses"]), "diff --json lost the diff blocks"
+        agentsync.main(["apply", *common])  # reconverge
+
         # A5: uninstall removes only ours; unrelated user key survives.
         assert (root / ".claude/mcp-servers.json").exists()
         assert (root / ".config/opencode/plugin/determinism.js").is_symlink()
@@ -77,7 +103,31 @@ def main():
         oc = json.loads((root / ".config/opencode/opencode.json").read_text())
         assert "mcp" not in oc and "skill" not in oc.get("permission", {}), "opencode keys not removed"
 
+    resolve_config_checks()
     print("test_lifecycle: PASS")
+
+
+def resolve_config_checks():
+    """Config-dir resolution: --config wins; repo config/ then config.example/; an
+    installed CLI (no repo dirs) falls back to ~/.config/agentsync or errors clearly."""
+    from unittest import mock
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        repo, home = tmp / "repo", tmp / "home"
+        (home / ".config/agentsync").mkdir(parents=True)
+        assert agentsync.resolve_config(str(tmp / "explicit"), repo) == tmp / "explicit"
+        with mock.patch.object(Path, "home", return_value=home):
+            assert agentsync.resolve_config(None, repo) == home / ".config/agentsync"
+            (repo / "config.example").mkdir(parents=True)
+            assert agentsync.resolve_config(None, repo) == repo / "config.example"
+            (repo / "config").mkdir()
+            assert agentsync.resolve_config(None, repo) == repo / "config"
+            with mock.patch.object(Path, "home", return_value=tmp / "nohome"):
+                try:
+                    agentsync.resolve_config(None, tmp / "norepo")
+                    raise AssertionError("expected a clear error with no config anywhere")
+                except SystemExit as e:
+                    assert "no config found" in str(e)
 
 
 if __name__ == "__main__":

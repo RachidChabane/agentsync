@@ -1,4 +1,5 @@
 {
-  "_comment": "Which harnesses to manage. Remove any you don't use; `init` only enables the ones it detects installed. Optional 'root' overrides the target (default: $HOME) — handy for dry-runs.",
-  "harnesses": ["claude", "copilot", "opencode", "vscode"]
+  "_comment": "Which harnesses to manage. Remove any you don't use; `init` only enables the ones it detects installed. Optional 'root' overrides the target (default: $HOME) — handy for dry-runs. 'enforcement' wires the determinism protocol (commit gate + session nudge) into each harness; set false for config-sync only.",
+  "harnesses": ["claude", "copilot", "opencode", "vscode"],
+  "enforcement": true
 }

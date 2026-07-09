@@ -1,0 +1,30 @@
+# Packaging for `pipx install agentsync` / `uvx agentsync` — no clone needed.
+# Installed mode has no repo config/; the CLI falls back to ~/.config/agentsync
+# (see resolve_config). Stdlib only: zero runtime dependencies, by design.
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentsync"
+description = "One declarative config, rendered into every AI coding assistant — with verify/diff/uninstall drift control."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+dependencies = []
+dynamic = ["version"]
+urls = { Homepage = "https://github.com/RachidChabane/agentsync" }
+
+[project.scripts]
+agentsync = "core.agentsync:main"
+
+[tool.setuptools]
+packages = ["core", "core.adapters"]
+
+[tool.setuptools.dynamic]
+version = { attr = "core.__version__" }
+
+# The enforcement hooks/plugin ship inside the package so ctx.enforce_dir resolves
+# when installed (pip restores the scripts' exec bits from the wheel).
+[tool.setuptools.package-data]
+core = ["enforcement/*"]

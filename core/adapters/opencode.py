@@ -37,6 +37,7 @@ class OpenCode(Adapter):
                          (("permission", "skill"), skill_perms),
                          (("instructions",), [str(ctx.instructions)])] + extra_owned,
                   hooks=[], extra_hooks=extra_hooks, label="config"),
-            Link(base / "plugin" / "determinism.js",
-                 ctx.enforce_dir / "opencode-plugin.js", "plugin"),
+            *([Link(base / "plugin" / "determinism.js",
+                    ctx.enforce_dir / "opencode-plugin.js", "plugin")]
+              if ctx.enforcement else []),
         ]

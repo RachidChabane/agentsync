@@ -36,7 +36,8 @@ class Claude(Adapter):
             Merge(base / "settings.json",
                   owned=[(("skillOverrides",), overrides)] + extra_owned,
                   hooks=[HookSpec("SessionStart", f'"{nudge}" || true', "session-nudge.sh"),
-                         HookSpec("PreToolUse", f'"{guard}"', "guard-commit.sh", matcher="Bash")],
+                         HookSpec("PreToolUse", f'"{guard}"', "guard-commit.sh", matcher="Bash")]
+                  if ctx.enforcement else [],
                   extra_hooks=extra_hooks, label="settings"),
             ClaudeMcp(servers, ctx.root),
             *self._skill_links(ctx, base / "skills"),

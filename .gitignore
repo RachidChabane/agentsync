@@ -3,5 +3,13 @@
 
 __pycache__/
 *.pyc
+
+# Python packaging artifacts (pyproject.toml build)
+/build/
+/dist/
+*.egg-info/
 *.bak
 *.bak[0-9]*
+
+# Local analysis notes (not published)
+/docs/market-analysis-2026.md

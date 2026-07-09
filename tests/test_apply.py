@@ -99,7 +99,34 @@ def main():
         assert agentsync.main(["apply", *common]) == 0
         assert "db" not in json.loads((root / ".claude/mcp-servers.json").read_text())
 
+    enforcement_off()
     print("\ntest_apply: PASS")
+
+
+def enforcement_off():
+    """profile {"enforcement": false} => config sync only: no gate/nudge hooks anywhere,
+    no OpenCode plugin — while instructions/MCP/skills still render."""
+    with tempfile.TemporaryDirectory() as tmp:
+        root, cfg = Path(tmp) / "home", Path(tmp) / "cfg"
+        write_config(cfg)
+        (cfg / "profile.json").write_text(json.dumps(
+            {"harnesses": ["claude", "copilot", "opencode", "vscode"], "enforcement": False}))
+        common = ["--root", str(root), "--config", str(cfg), "--no-mcp-import"]
+        assert agentsync.main(["apply", *common]) == 0
+
+        for f in (root / ".claude/settings.json", root / ".copilot/settings.json"):
+            s = json.loads(f.read_text())
+            assert not any(m in json.dumps(s.get("hooks", {}))
+                           for m in ("guard-commit", "session-nudge", "prompt-context")), \
+                f"enforcement hook leaked into {f}"
+        vh = json.loads((root / ".config/agentsync/vscode-hooks.json").read_text())
+        assert vh == {"hooks": {}}, f"vscode determinism hooks not gated: {vh}"
+        assert not (root / ".config/opencode/plugin/determinism.js").exists(), \
+            "opencode plugin installed despite enforcement=false"
+        # sync itself still works
+        assert (root / ".claude/CLAUDE.md").is_symlink()
+        assert (root / ".claude/mcp-servers.json").exists()
+        assert agentsync.main(["verify", *common]) == 0, "verify dirty after apply"
 
 
 if __name__ == "__main__":

@@ -16,6 +16,7 @@ verify:  ## syntax-check all sources + run the test suite (no writes to $HOME)
 	@for f in core/enforcement/*.sh init.sh install.sh skills/*/*.sh tests/*.sh; do bash -n "$$f" || exit 1; done && echo "· bash ok"
 	@node --check core/enforcement/opencode-plugin.js && echo "· node ok"
 	@for f in config.example/*.json; do python3 -c "import json,sys;json.load(open(sys.argv[1]))" "$$f" || exit 1; done && echo "· json ok"
+	@python3 -c "import tomllib;tomllib.load(open('pyproject.toml','rb'))" && echo "· toml ok"
 	@bash tests/test_runner.sh
 	@bash tests/test_scaffold.sh
 	@python3 tests/test_apply.py

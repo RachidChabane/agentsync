@@ -36,7 +36,8 @@ class Copilot(Adapter):
             Merge(base / "settings.json",
                   owned=[(("disabledSkills",), hidden)] + extra_owned,
                   hooks=[HookSpec("userPromptSubmitted", nudge, "prompt-context.sh", key="bash"),
-                         HookSpec("preToolUse", guard, "guard-commit.sh", matcher="bash", key="bash")],
+                         HookSpec("preToolUse", guard, "guard-commit.sh", matcher="bash", key="bash")]
+                  if ctx.enforcement else [],
                   extra_hooks=extra_hooks, label="settings"),
             *self._skill_links(ctx, base / "skills"),
         ]
