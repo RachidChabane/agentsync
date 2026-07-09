@@ -38,8 +38,12 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           # Sonnet is plenty for a bounded diff-and-patch task and keeps subscription
           # burn to ~1-3%/week even if drift fired daily. Alias, not a pinned id —
-          # tracks whatever the latest Sonnet is.
-          claude_args: "--model sonnet"
+          # tracks whatever the latest Sonnet is. Agent mode denies Bash by default,
+          # so allow exactly the commands the prompt requires (spec_watch, verify,
+          # branch/push, PR + issue comment).
+          claude_args: >-
+            --model sonnet
+            --allowedTools "Bash(python3:*),Bash(make:*),Bash(git:*),Bash(gh:*),Read,Edit,Write,Glob,Grep"
           prompt: |
             Issue #${{ github.event.issue.number }} is a spec-watch drift report: an upstream
             harness doc changed. Read the issue body's diff, then the affected adapter(s) in
