@@ -176,4 +176,4 @@ Tip
 For monorepos or projects with shared standards, using opencode.json with glob patterns (like packages/*/AGENTS.md) is more maintainable than manual instructions.
 Edit pageFound a bug? Open an issueJoin our Discord community Select language EnglishالعربيةBosanskiDanskDeutschEspañolFrançaisItaliano日本語한국어Norsk BokmålPolskiPortuguês (Brasil)РусскийไทยTürkçe简体中文繁體中文
 © Anomaly
-Last updated: Jul 8, 2026
+Last updated: Jul 9, 2026
