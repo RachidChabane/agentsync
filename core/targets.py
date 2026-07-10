@@ -17,7 +17,8 @@ from pathlib import Path
 from .util import Ctx, Report, backup_once, dump, load_json
 
 
-def _udiff(name: str, old: str, new: str) -> str:
+def udiff(name: str, old: str, new: str) -> str:
+    """Shared write-preview primitive — also imported by sibling concerns (plugpack)."""
     return "".join(difflib.unified_diff(old.splitlines(keepends=True),
                                         new.splitlines(keepends=True),
                                         fromfile=f"a/{name}", tofile=f"b/{name}")) or ""
@@ -52,7 +53,7 @@ class Target:
     def _pending(self, ctx, rep, msg, name="", old="", new=""):
         rep.diff(msg)
         if ctx.verb == "diff" and (old or new):
-            block = _udiff(name, old, new)
+            block = udiff(name, old, new)
             if block:
                 rep.diffs.append(block)
 
