@@ -71,8 +71,8 @@ are written **once** in a neutral vocabulary, optional commands and MCP servers 
 renders into each tool's native plugin + marketplace format: Claude Code
 (`.claude-plugin/`, bare-key `.mcp.json`) and GitHub Copilot CLI / VS Code
 (`.github/plugin/`, `mcpServers`-wrapped). Each output tree is a directly installable
-marketplace: `claude plugin marketplace add dist/claude`, `copilot plugin marketplace
-add dist/copilot`. Lossy translations (a Claude-only `model` alias, VS-Code-only
+marketplace: `claude plugin marketplace add ./dist/claude`, `copilot plugin marketplace
+add ./dist/copilot` (both CLIs need the `./` — a bare `a/b` parses as a GitHub repo). Lossy translations (a Claude-only `model` alias, VS-Code-only
 `handoffs`, an unmappable tool id) always **warn**, never degrade silently; `--strict`
 turns warnings into exit 2. Bundle layout and the neutral tool vocabulary are in
 `core/plugpack.py`'s docstring; every format fact was verified against primary sources

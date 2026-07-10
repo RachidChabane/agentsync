@@ -42,6 +42,7 @@ format drift weekly. Stdlib only.
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -50,20 +51,24 @@ from .targets import udiff
 from .util import dump, load_json
 
 TOOLS = ("claude", "copilot")
+MARKET = {"claude": ".claude-plugin/marketplace.json",
+          "copilot": ".github/plugin/marketplace.json"}
 
 # Neutral tool vocabulary -> per-tool grant ids. Claude ids: code.claude.com/docs/en/
 # sub-agents + tools-reference (comma-separated string in frontmatter). Copilot ids:
-# the VS Code built-in tools table (namespaced generation) + bare group grants as used
-# by live awesome-copilot agents ('read', 'search', 'web', 'edit').
+# the "Tool aliases" table in docs.github.com/en/copilot/reference/
+# custom-agents-configuration (primary aliases: execute/read/edit/search/agent/web/
+# todo — bare, case-insensitive; unrecognized names are silently ignored by Copilot,
+# so an id absent from that table is a silent capability loss, not an error).
 TOOLMAP = {
     "read": {"claude": ["Read"], "copilot": ["read"]},
     "edit": {"claude": ["Edit", "Write", "NotebookEdit"], "copilot": ["edit"]},
     "search": {"claude": ["Grep", "Glob"], "copilot": ["search"]},
-    "execute": {"claude": ["Bash"], "copilot": ["execute/runInTerminal"]},
+    "execute": {"claude": ["Bash"], "copilot": ["execute"]},
     "web": {"claude": ["WebFetch", "WebSearch"], "copilot": ["web"]},
-    "subagents": {"claude": ["Agent"], "copilot": ["agent/runSubagent"]},
+    "subagents": {"claude": ["Agent"], "copilot": ["agent"]},
     "todos": {"claude": ["TaskCreate", "TaskGet", "TaskList", "TaskUpdate"],
-              "copilot": ["todos"]},
+              "copilot": ["todo"]},
 }
 AGENT_KEYS = {"name", "description", "tools", "model", "argument-hint", "handoffs"}
 META_KEYS = ("description", "version", "author", "homepage", "repository", "license",
@@ -124,11 +129,20 @@ def _kebab(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
 
 
+def _person(v):
+    """Both ecosystems require owner/author to be an object with a name — coerce the
+    common package.json string convention instead of emitting an invalid manifest."""
+    return {"name": v} if isinstance(v, str) else v
+
+
 def map_tools(tools, plugin: str, mcp: dict, agent: str, warns: list):
     """The lossy core: one neutral grant list -> a per-tool list for each target,
     warning on anything that cannot be expressed."""
     if isinstance(tools, str):                   # tolerate the Claude comma form
         tools = [t.strip() for t in tools.split(",") if t.strip()]
+    if not isinstance(tools, list):
+        warns.append(f"agent {agent}: tools must be a list (got {tools!r}) — no tools granted")
+        tools = []
     out = {"claude": [], "copilot": []}
     for t in tools:
         if not isinstance(t, str):
@@ -160,6 +174,9 @@ def render_agent(path: Path, plugin: str, mcp: dict, warns: list):
     aname = str(fields.get("name") or path.stem)
     if not fields.get("description"):
         sys.exit(f"error: {path}: agent frontmatter needs a description")
+    if not _kebab(aname):
+        sys.exit(f"error: {path}: agent name '{aname}' has no ascii letters/digits — "
+                 "claude requires a kebab-case name")
     for k in sorted(set(fields) - AGENT_KEYS):
         warns.append(f"agent {aname}: frontmatter key '{k}' is not in the canonical "
                      "schema — dropped")
@@ -176,7 +193,8 @@ def render_agent(path: Path, plugin: str, mcp: dict, warns: list):
 
     co = [f"name: {_q(aname)}", f"description: {_q(fields['description'])}"]
     if grants["copilot"]:
-        co.append("tools: [" + ", ".join(f"'{t}'" for t in grants["copilot"]) + "]")
+        co.append("tools: [" + ", ".join(
+            "'" + t.replace("'", "''") + "'" for t in grants["copilot"]) + "]")
     if fields.get("argument-hint"):
         co.append(f"argument-hint: {_q(fields['argument-hint'])}")
     if fields.get("handoffs"):
@@ -203,8 +221,9 @@ def render(src: Path):
         sys.exit(f"error: {src} is not a directory")
     meta = load_json(src / "bundle.json") or {}
     name = str(meta.get("name") or _kebab(src.resolve().name))
-    if name != _kebab(name):
-        sys.exit(f"error: bundle name '{name}' must be kebab-case (both ecosystems require it)")
+    if not name or name != _kebab(name):
+        sys.exit(f"error: bundle name '{name}' must be non-empty kebab-case (set \"name\" "
+                 "in bundle.json; both ecosystems require it)")
     mcp = load_json(src / "mcp.json") or {}
     if "mcpServers" in mcp:
         sys.exit(f"error: {src / 'mcp.json'} must use bare server-name keys (the Claude-"
@@ -213,10 +232,16 @@ def render(src: Path):
     files: dict = {}
     root = {"claude": f"claude/plugins/{name}", "copilot": f"copilot/plugins/{name}"}
 
-    # skills + any other bundle docs: verbatim pass-through (the portable part)
+    # skills: verbatim pass-through (the portable part)
     for p in sorted(src.rglob("*")):
         rel = p.relative_to(src).as_posix()
-        if p.is_file() and rel.split("/")[0] == "skills":
+        if rel.split("/")[0] != "skills":
+            continue
+        if p.is_symlink():  # packed output must be self-contained — never embed a
+            warns.append(   # symlink target's content silently
+                f"skill file {rel} is a symlink — skipped (commit the real file instead)")
+            continue
+        if p.is_file():
             for t in TOOLS:
                 files[f"{root[t]}/{rel}"] = p.read_bytes()
 
@@ -239,9 +264,9 @@ def render(src: Path):
         files[f"{root['claude']}/.mcp.json"] = dump(mcp).encode()
         files[f"{root['copilot']}/.mcp.json"] = dump({"mcpServers": mcp}).encode()
 
-    owner = meta.get("owner") or meta.get("author") or {"name": name}
+    owner = _person(meta.get("owner") or meta.get("author")) or {"name": name}
     manifest = {"name": name, **{k: meta[k] for k in META_KEYS if k in meta}}
-    manifest.setdefault("author", owner)  # claude validate warns without attribution
+    manifest["author"] = _person(manifest.get("author")) or owner
     files[f"{root['claude']}/.claude-plugin/plugin.json"] = dump(manifest).encode()
     co_manifest = dict(manifest)
     pre = f"{root['claude']}/skills/"
@@ -257,7 +282,7 @@ def render(src: Path):
 
     entry = {"name": name,
              **{k: meta[k] for k in ("description", "version") if k in meta}}
-    files["claude/.claude-plugin/marketplace.json"] = dump({
+    files[f"claude/{MARKET['claude']}"] = dump({
         "name": f"{name}-marketplace",
         **({"description": meta["description"]} if "description" in meta else {}),
         "owner": owner,
@@ -267,13 +292,32 @@ def render(src: Path):
     if md:
         market["metadata"] = md
     market.update(owner=owner, plugins=[{**entry, "source": f"plugins/{name}"}])
-    files["copilot/.github/plugin/marketplace.json"] = dump(market).encode()
+    files[f"copilot/{MARKET['copilot']}"] = dump(market).encode()
     return files, warns
 
 
 def pack(files: dict, out: Path, tools) -> None:
     """Converge the owned output tree: write what changed, prune what we no longer
     render (the packager owns these subtrees wholesale)."""
+    for t in tools:
+        troot = out / t
+        # owned-vs-preserved: only converge a tree that is empty or that THIS bundle
+        # packed (its marketplace manifest carries our marketplace name) — never eat a
+        # user's unrelated directory, and never write through a symlink
+        if troot.is_symlink():
+            sys.exit(f"error: {troot} is a symlink — refusing to converge through it")
+        if troot.exists() and not troot.is_dir():
+            sys.exit(f"error: {troot} exists and is not a directory")
+        if troot.is_dir() and any(troot.iterdir()):
+            want = json.loads(files[f"{t}/{MARKET[t]}"].decode())["name"]
+            try:
+                have = (load_json(troot / MARKET[t]) or {}).get("name")
+            except ValueError:
+                have = None
+            if have != want:
+                sys.exit(f"error: refusing to converge {troot} — non-empty and not this "
+                         f"bundle's packed output (marketplace {have!r}, expected "
+                         f"{want!r}); use an empty --out")
     for rel, data in sorted(files.items()):
         p = out / rel
         if not (p.exists() and p.read_bytes() == data):

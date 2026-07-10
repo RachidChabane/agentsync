@@ -137,6 +137,103 @@ def author_errors():
             raise AssertionError("wrapped mcp.json not rejected")
         except SystemExit as e:
             assert "bare server-name keys" in str(e)
+    with tempfile.TemporaryDirectory() as tmp:
+        src = Path(tmp) / "bundle"
+        shutil.copytree(BUNDLE, src)
+        (src / "agents/emoji.md").write_text("---\nname: '急急'\ndescription: d\n---\nb\n")
+        try:
+            plugpack.render(src)
+            raise AssertionError("empty kebab name not rejected")
+        except SystemExit as e:
+            assert "kebab-case" in str(e)
+
+
+def refuses_foreign_tree():
+    """owned-vs-preserved: pack never converges a non-empty dir it didn't produce —
+    including one that carries someone ELSE's marketplace manifest or a symlink."""
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp) / "dist"
+        (out / "claude").mkdir(parents=True)
+        (out / "claude" / "precious.txt").write_text("user data\n")
+        try:
+            plugpack.main([str(BUNDLE), "--out", str(out)])
+            raise AssertionError("packed over a foreign directory")
+        except SystemExit as e:
+            assert "refusing to converge" in str(e)
+        assert (out / "claude" / "precious.txt").exists(), "user file eaten"
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp) / "dist"  # a REAL third-party marketplace must not pass the guard
+        (out / "claude" / ".claude-plugin").mkdir(parents=True)
+        (out / "claude" / ".claude-plugin" / "marketplace.json").write_text(
+            json.dumps({"name": "someones-real-marketplace", "plugins": []}))
+        (out / "claude" / "precious.txt").write_text("user data\n")
+        try:
+            plugpack.main([str(BUNDLE), "--out", str(out)])
+            raise AssertionError("packed over a foreign marketplace")
+        except SystemExit as e:
+            assert "someones-real-marketplace" in str(e)
+        assert (out / "claude" / "precious.txt").exists(), "user file eaten"
+    with tempfile.TemporaryDirectory() as tmp:
+        out, target = Path(tmp) / "dist", Path(tmp) / "elsewhere"
+        target.mkdir()
+        out.mkdir()
+        (out / "claude").symlink_to(target)
+        try:
+            plugpack.main([str(BUNDLE), "--out", str(out)])
+            raise AssertionError("packed through a symlink")
+        except SystemExit as e:
+            assert "symlink" in str(e)
+
+
+def lossy_inputs_warn_not_crash():
+    with tempfile.TemporaryDirectory() as tmp:
+        src = Path(tmp) / "bundle"
+        shutil.copytree(BUNDLE, src)
+        # tools as a non-list scalar: warn + no grants, never a traceback
+        (src / "agents/broken.md").write_text("---\ndescription: d\ntools: true\n---\nb\n")
+        # a symlinked skill file must be skipped, not embedded
+        (Path(tmp) / "secret.txt").write_text("TOP SECRET\n")
+        (src / "skills/greet/leak.txt").symlink_to(Path(tmp) / "secret.txt")
+        files, warns = plugpack.render(src)
+        text = "\n".join(warns)
+        assert "agent broken: tools must be a list" in text, text
+        assert "skill file skills/greet/leak.txt is a symlink" in text, text
+        assert not any("leak.txt" in f for f in files), "symlink content embedded"
+        assert "TOP SECRET" not in str(files.values())
+
+
+def owner_author_coercion():
+    """package.json-style string author must render as the mandated {name} object."""
+    with tempfile.TemporaryDirectory() as tmp:
+        src = Path(tmp) / "bundle"
+        shutil.copytree(BUNDLE, src)
+        (src / "bundle.json").write_text(json.dumps(
+            {"name": "demo", "description": "d", "author": "Jane Doe"}))
+        files, _ = plugpack.render(src)
+        mk = json.loads(files["claude/.claude-plugin/marketplace.json"].decode())
+        assert mk["owner"] == {"name": "Jane Doe"}, mk["owner"]
+        cp = json.loads(files["claude/plugins/demo/.claude-plugin/plugin.json"].decode())
+        assert cp["author"] == {"name": "Jane Doe"}, cp["author"]
+
+
+def toolmap_copilot_aliases():
+    """Copilot grants must be the documented primary aliases (bare, from the GitHub
+    'Tool aliases' table) — unrecognized ids are silently ignored by Copilot."""
+    warns = []
+    g = plugpack.map_tools(["execute", "subagents", "todos", "o'docs/*"],
+                           "demo", {"o'docs": {}}, "a", warns)
+    assert g["copilot"] == ["execute", "agent", "todo", "o'docs/*"], g["copilot"]
+    assert g["claude"][:1] == ["Bash"] and "mcp__plugin_demo_o'docs" in g["claude"]
+    assert not warns, warns
+    # an apostrophe in a grant must survive YAML single-quoting ('' escape)
+    with tempfile.TemporaryDirectory() as tmp:
+        src = Path(tmp) / "bundle"
+        shutil.copytree(BUNDLE, src)
+        (src / "agents/quote.md").write_text(
+            "---\ndescription: d\ntools: [\"copilot:o'x\"]\n---\nb\n")
+        files, _ = plugpack.render(src)
+        co = files["copilot/plugins/demo/agents/quote.agent.md"].decode()
+        assert "tools: ['o''x']" in co, co
 
 
 def front_parser():
@@ -159,6 +256,10 @@ def main():
     warnings()
     removed_agent_pruned()
     author_errors()
+    refuses_foreign_tree()
+    lossy_inputs_warn_not_crash()
+    owner_author_coercion()
+    toolmap_copilot_aliases()
     front_parser()
     print("test_plugpack: PASS")
 
