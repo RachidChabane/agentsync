@@ -29,6 +29,36 @@ make apply         # ... then render it into every tool
 First run stops after creating `config/` (so placeholders never reach your live tools).
 After that, edit `config/` and re-run `make apply` to update — idempotent.
 
+## Repo map
+
+```text
+core/                 the engine — mechanism only, never holds personal data
+  agentsync.py          reconciler CLI: apply / verify / diff / uninstall / doctor / docs
+  targets.py            declarative convergence primitives (Link, File, Json, Merge, ClaudeMcp)
+  adapters/             one module per harness — the ONLY place per-harness knowledge lives
+  enforcement/          determinism-protocol hooks (commit gate, session nudge, OpenCode plugin)
+  plugpack.py           sibling concern: `agentsync pack` — plugin bundle → marketplace trees
+  spec_watch.py         weekly drift check of the upstream docs the adapters' facts came from
+  gen_docs.py           generates the inventory docs;  skills.py: skill sourcing + tiers
+config/               YOUR policy — git-ignored, private; created by init.sh from …
+config.example/       … this tracked template (instructions.md, mcp.json, skills.json, …)
+skills/               agentsync's OWN Agent Skills (the LLM-judgment layer: add-harness,
+                      author-verify, import-config) — NOT your skills; yours are
+                      configured in config/skills.json and only linked from elsewhere
+examples/demo-bundle/ canonical plugin bundle: input for `agentsync pack` and its tests
+tests/                sandboxed suite behind `make verify`; golden/ pins rendered output
+docs/                 ci.md is the only human doc — spec-sources.json + spec-snapshots/
+                      are machine-managed state for spec_watch (generated; don't edit)
+bin/agentsync         the CLI shim that init.sh symlinks onto your PATH
+install.sh            curl-able one-liner: clones the repo, then runs …
+init.sh               … clone-side setup: detect harnesses, create config/, apply
+Makefile              deterministic front door (make help / init / apply / verify)
+```
+
+Three things are all called "skills"; they are different: `skills/` (this repo's own
+judgment-layer skills), `config/skills.json` (which of *your* skills go to which
+harness), and a bundle's `skills/` dir (content that `pack` ships verbatim).
+
 ## Commands
 
 `init.sh` puts an `agentsync` CLI on your PATH; run it from anywhere (it operates on the
