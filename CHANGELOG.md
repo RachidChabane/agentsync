@@ -6,6 +6,18 @@ All notable changes to this project are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- **`agentsync pack`** (`core/plugpack.py`): package one canonical plugin bundle
+  (skills verbatim, agents with tool grants written once in a neutral vocabulary,
+  commands, MCP) into Claude Code's and GitHub Copilot's native plugin + marketplace
+  trees — each directly installable. Lossy translations always warn (`--strict` makes
+  warnings fatal); `--check` is a read-only CI drift gate over the packed output.
+  Both dialects verified against primary sources (bare-key vs `mcpServers`-wrapped
+  `.mcp.json`, comma-string vs YAML-array tool grants, `.claude-plugin/` vs
+  `.github/plugin/`) and proven end-to-end in both real CLIs; the source pages joined
+  the spec-watch and the example bundle lives in `examples/demo-bundle/`.
+- Golden-snapshot test (`tests/test_golden.py`): the rendered output of a full apply
+  (8 harnesses, user + project scope) is locked byte-for-byte against a committed
+  golden, so refactors provably cannot change config-sync's observable output.
 - `spec_watch.py` + weekly CI cron: deterministic drift detection for the upstream
   harness docs each adapter's format facts came from; changes open an issue with the
   text diff.

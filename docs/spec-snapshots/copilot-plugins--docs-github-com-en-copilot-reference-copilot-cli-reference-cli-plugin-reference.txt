@@ -1,0 +1,722 @@
+GitHub Copilot CLI plugin reference - GitHub Docs
+Skip to main content
+GitHub Docs
+Version: Free, Pro, & Team
+Search or ask Copilot
+Search or askCopilot
+Select language: current language is English
+Search or ask Copilot
+Search or askCopilot
+Open menu
+Open Sidebar
+GitHub Copilot
+Reference
+Copilot CLI reference
+CLI plugin reference
+Home
+GitHub Copilot
+Get started
+Quickstart
+What is GitHub Copilot?
+Plans
+Features
+Best practices
+Enterprise AI governance
+Concepts
+Completions
+Code suggestions
+Code referencing
+Chat
+Agents
+Cloud agent
+About cloud agent
+Agent management
+Custom agents
+About automations
+Access management
+MCP and cloud agent
+Risks and mitigations
+Copilot CLI
+About Copilot CLI
+Comparing CLI features
+Copilot CLI in Actions
+Cancel and roll back
+Context management
+About remote control
+Custom agents
+Autonomous task completion
+Parallel task execution
+Researching with Copilot
+Session data
+About rubber duck
+LSP servers
+CLI extensions
+Tool search
+GitHub Copilot app
+Copilot in JetBrains
+Code review
+Agentic Workflows
+Copilot Memory
+Hooks
+Plugins
+Enterprise plugin standards
+Third-party coding agents
+Agent apps
+OpenAI Codex
+Anthropic Claude
+Agent skills
+Enterprise management
+Cloud and local sandboxes
+Spark
+Copilot usage metrics
+All articles
+Copilot usage metrics
+Prompting
+Prompt engineering
+Response customization
+Context
+MCP
+Spaces
+Repository indexing
+Content exclusion
+Tools
+AI tools
+About Copilot integrations
+Models
+Utility models
+Auto model selection
+FedRAMP models
+Base and LTS models
+Usage limits
+Billing
+Billing for individuals
+Billing for organizations and enterprises
+Budgets
+Individual plans
+Organizations and enterprises
+Copilot-only enterprises
+Policies
+MCP management
+Network settings
+New features and models
+How-tos
+Copilot on GitHub
+Set up Copilot
+Enable Copilot
+Set up for self
+Set up for organization
+Set up for enterprise
+Set up a dedicated enterprise
+Set up for students
+Set up for teachers and OS maintainers
+Configure access to AI models
+Configure automatic review
+Configure runners
+Chat with Copilot
+Get started with chat
+Chat in GitHub
+Chat in Mobile
+Customize Copilot
+Customize Copilot overview
+Add custom instructions
+Add personal instructions
+Add repository instructions
+Add organization instructions
+Customize cloud agent
+Create custom agents
+Add agent skills
+Use hooks
+Customize the agent environment
+Configure secrets and variables
+Customize the agent firewall
+Test custom agents
+Configure MCP servers
+Spaces
+Create Copilot Spaces
+Collaborate with others
+Copilot for GitHub tasks
+Use Copilot to create or update issues
+Create a PR summary
+Use the GitHub MCP Server from Copilot Chat
+Use Copilot agents
+Get started
+Kick off a task
+Research, plan, iterate
+Manage agent sessions
+Copilot code review
+Review Copilot output
+Set up
+Set up for self
+Install Copilot extension
+Get code suggestions
+Get IDE code suggestions
+Find matching code
+Chat with Copilot
+Get started with Chat in your IDE
+Chat in IDE
+Chat in Windows Terminal
+Copilot CLI
+All articles
+Copilot CLI quickstart
+Copilot CLI best practices
+Set up Copilot CLI
+Install Copilot CLI
+Authenticate Copilot CLI
+Configure Copilot CLI
+Add LSP servers
+Troubleshoot Copilot CLI auth
+Use Copilot CLI
+Overview
+Allowing tools
+Voice input
+Connect to VS Code
+Delegate tasks to Copilot
+Browse issues, PRs, gists
+Roll back changes
+Invoke custom agents
+Steer agents
+Steer a session remotely
+Set an AI credit limit
+Agentic code review
+Manage pull requests
+Speed up task completion
+Use session data
+Automate with Copilot CLI
+Quickstart
+Run the CLI programmatically
+Schedule prompts
+Automate with Actions
+Customize Copilot CLI
+Overview
+Add custom instructions
+Change settings
+Use hooks
+Add agent skills
+Add MCP servers
+Create custom agents
+Use your own model provider
+Plugins: Find and install
+Plugins: Create a plugin
+Plugins: Create a marketplace
+Administer for enterprise
+Copilot CLI in Actions
+Cloud and local sandboxes for GitHub Copilot
+Enable or disable cloud sandboxes
+Configure local sandbox
+GitHub Copilot app
+All articles
+Quickstart
+Customize the GitHub Copilot app
+Agent sessions
+Canvas extensions
+Managing issues and pull requests
+Automations
+Use your own model provider
+Open with deep links
+Copilot SDK
+Authentication
+Authenticate
+BYOK
+Features
+Agent Loop
+Cloud Sessions
+Custom Agents
+Fleet Mode
+Hooks
+Image Input
+MCP
+Plugin Directories
+Remote Sessions
+Session limits
+Session Persistence
+Skills
+Steering And Queueing
+Streaming Events
+Getting Started
+Use hooks
+Error Handling
+Hooks Overview
+Post Tool Use
+Pre Tool Use
+Session Lifecycle
+User Prompt Submitted
+Integrations
+Microsoft Agent Framework
+Observability
+Opentelemetry
+Set up Copilot SDK
+Azure Managed Identity
+Backend Services
+Bundled CLI
+Choosing A Setup Path
+GitHub OAuth
+Local CLI
+Multi Tenancy
+Scaling
+Troubleshooting
+Compatibility
+Debugging
+MCP Debugging
+GitHub Agentic Workflows
+Quickstart
+Creating agentic workflows
+Use Copilot agents
+Cloud agent
+Start Copilot sessions
+Create cloud automations
+Changing the AI model
+Configuring agent settings
+Create custom agents in your IDE
+Use cloud agent on GitHub
+Use cloud agent on GitHub Mobile
+Use agent apps
+Use cloud agent in your IDE
+Use cloud agent via the API
+Use cloud agent from the GitHub CLI
+Use cloud agent via GitHub MCP Server
+Integrate cloud agent with Jira
+Integrate cloud agent with Slack
+Integrate cloud agent with Teams
+Integrate cloud agent with Linear
+Integrate cloud agent with Azure Boards
+Use cloud agent from Raycast
+Troubleshoot cloud agent
+Request a code review
+Use code review
+Copilot Memory
+Manage for yourself
+Manage as administrator
+Use AI models
+Change the chat model
+Change the completion model
+Provide context
+Use Copilot Spaces
+Use Copilot Spaces
+Use MCP in your IDE
+Extend Copilot Chat with MCP
+Set up the GitHub MCP Server
+Enterprise configuration
+Configure toolsets
+Use the GitHub MCP Server
+Change MCP registry
+Configure custom instructions
+Add repository instructions in your IDE
+Configure content exclusion
+Exclude content from Copilot
+Review changes
+Use Copilot for common tasks
+Use Copilot in the CLI
+Configure personal settings
+Configure network settings
+Configure in IDE
+Authenticate to GHE.com
+Manage and track spending
+Monitor AI credits usage
+Manage company spending
+Manage your account
+Get started with a Copilot plan
+View and change your Copilot plan
+Disable Copilot Free
+Manage policies
+Administer Copilot
+Manage for organization
+Manage plan
+Cancel
+Manage access
+Grant access
+Manage requests for access
+Revoke access
+Manage network access
+Manage policies
+Add Copilot cloud agent
+Configure agent runners
+Prepare for custom agents
+Manage default models
+Review activity
+Review user activity data
+Use your own API keys
+Manage for enterprise
+Manage plan
+Subscribe
+Cancel plan
+Upgrade plan
+Downgrade subscription
+Manage access
+Grant access
+Disable for organizations
+View license usage
+Manage network access
+Manage enterprise policies
+Manage agents
+Prepare for custom agents
+Create github-private repository
+Enterprise managed settings
+Monitor agentic activity
+Enable Copilot cloud agent
+Block agentic features
+Enable Copilot code review
+Manage Spark
+Manage model availability
+Use your own API keys
+Review audit logs
+Manage MCP usage
+Configure MCP registry
+Configure MCP server access
+Download activity report
+View usage and adoption
+View code generation
+Troubleshoot Copilot
+Troubleshoot common issues
+View logs
+Troubleshoot firewall settings
+Troubleshoot network errors
+Troubleshoot Spark
+Troubleshoot slow responses
+Reference
+Chat cheat sheet
+Customization cheat sheet
+AI models
+Supported models
+Model comparison
+Model hosting
+Copilot feature matrix
+Keyboard shortcuts
+Copilot CLI reference
+CLI command reference
+CLI plugin reference
+CLI programmatic reference
+ACP server
+CLI configuration directory
+Custom agents configuration
+Custom instructions support
+Hooks reference
+Policy conflicts
+Supported surfaces for policies
+Managed settings reference
+Copilot allowlist reference
+MCP allowlist enforcement
+Metrics data
+Copilot billing
+Models and pricing
+Billing cycle
+Seat assignment
+License changes
+Azure billing
+Request-based billing (legacy)
+What changed with billing (legacy)
+Copilot requests (legacy)
+Billing overview (legacy)
+Monitor premium requests (legacy)
+Model multipliers for annual plans (legacy)
+Agentic audit log events
+Agent session filters
+Review excluded files
+Copilot usage metrics
+Copilot usage metrics data
+Interpret usage metrics
+Reconciling Copilot usage metrics
+Copilot LoC metrics
+Team-level metrics
+Example schema
+Tutorials
+All tutorials
+GitHub Copilot Cookbook
+All prompts
+Communicate effectively
+Create templates
+Summarize repository activity
+Synthesize research
+Create diagrams
+Generate tables
+Debug errors
+Debug invalid JSON
+Handle API rate limits
+Diagnose CI test failures
+Analyze functionality
+Explore implementations
+Analyze feedback
+Generate code
+Implement a feature
+Refactor code
+Improve code readability
+Fix lint errors
+Refactor for optimization
+Refactor for sustainability
+Refactor design patterns
+Refactor data access layers
+Decouple business logic
+Handle cross-cutting
+Simplify inheritance hierarchies
+Fix database deadlocks
+Translate code
+Document code
+File issues without breaking flow
+Document legacy code
+Explain legacy code
+Explain complex logic
+Sync documentation
+Write discussions or blog posts
+Testing code
+Generate unit tests
+Create mock objects
+Create end-to-end tests
+Update unit tests
+Analyze security
+Secure your repository
+Manage dependency updates
+Find vulnerabilities
+Customization library
+All customizations
+Custom instructions
+Your first custom instructions
+Concept explainer
+Debugging tutor
+Code reviewer
+GitHub Actions helper
+Pull request assistant
+Issue manager
+Accessibility auditor
+Testing automation
+Prompt files
+Your first prompt file
+Create README
+Onboarding plan
+Document API
+Review code
+Generate unit tests
+Custom agents
+Your first custom agent
+Implementation planner
+Bug fix teammate
+Cleanup specialist
+Cloud agent
+Get the best results
+Pilot cloud agent
+Improve a project
+Build guardrails
+Give access to resources
+Set up budgets
+Get started with budgets
+Optimize budget configuration
+Spark
+Your first spark
+Prompt tips
+Build and deploy apps
+Deploy from CLI
+Customize code review
+Enhance agent mode with MCP
+Compare AI models
+Speed up development work
+Roll out at scale
+Assign licenses
+Choose enterprise plan
+Set up self-serve licenses
+Track usage and adoption
+Remind inactive users
+Govern at scale
+Resources for approval
+Establish AI managers
+Govern for adoption
+Pilot a feature or model
+Maintain codebase standards
+Enable developers
+Drive adoption
+Integrate AI agents
+Drive downstream impact
+Achieve company goals
+Increase test coverage
+Accelerate pull requests
+Reduce security debt
+Measure trial success
+Explore a codebase
+Explore issues and discussions
+Explore pull requests
+Write tests
+Refactor code
+Optimize AI usage
+Optimize code reviews
+Reduce technical debt
+Review AI code
+Learn a new language
+Modernize legacy code
+Modernize Java applications
+Migrate a project
+Plan a project
+Vibe coding
+Upgrade projects
+Use hooks with Copilot CLI
+Use an AI SME
+Create CLI extensions
+Responsible use
+Chat
+Inline suggestions
+Agents
+GitHub Copilot
+Reference
+Copilot CLI reference
+CLI plugin reference
+GitHub Copilot CLI plugin reference
+Find commands and configuration details for CLI plugins.
+Copy as Markdown
+In this article
+CLI commands
+plugin.json
+marketplace.json
+File locations
+Loading order and precedence
+Further reading
+Note
+You can find help on using plugins by entering copilot plugin [SUBCOMMAND] --help in the terminal.
+For an overview of what plugins are and how they work across Copilot clients, see About GitHub Copilot plugins.
+CLI commands
+You can use the following commands in the terminal to manage plugins for Copilot CLI.
+CommandDescription
+copilot plugin install SPECIFICATIONInstall a plugin. See Plugin specification for install command below.
+copilot plugin uninstall NAMERemove a plugin
+copilot plugin listList installed plugins
+copilot plugin update NAMEUpdate a named plugin. Use --all to update all installed plugins at once.
+copilot plugin enable NAMEEnable a previously disabled plugin
+copilot plugin disable NAMEDisable a plugin without uninstalling it
+copilot plugin marketplace add SPECIFICATIONRegister a marketplace
+copilot plugin marketplace listList registered marketplaces
+copilot plugin marketplace browse NAMEBrowse marketplace plugins
+copilot plugin marketplace remove NAMEUnregister a marketplace
+Plugin specification for install command
+FormatExampleDescription
+Marketplaceplugin@marketplacePlugin from a registered marketplace
+GitHubOWNER/REPORoot of a GitHub repository
+GitHub subdirOWNER/REPO:PATH/TO/PLUGINSubdirectory in a repository
+Git URLhttps://github.com/o/r.gitAny Git URL
+Local path./my-plugin or /abs/pathLocal directory
+plugin.json
+All plugins consist of a plugin directory containing, at minimum, a manifest file named plugin.json located at the root of the plugin directory. See Creating a plugin for GitHub Copilot CLI.
+Required field
+FieldTypeDescription
+namestringKebab-case plugin name (letters, numbers, hyphens only). Max 64 chars.
+Optional metadata fields
+FieldTypeDescription
+descriptionstringBrief description. Max 1024 chars.
+versionstringSemantic version (e.g., 1.0.0).
+authorobjectname (required), email (optional), url (optional).
+homepagestringPlugin homepage URL.
+repositorystringSource repository URL.
+licensestringLicense identifier (e.g., MIT).
+keywordsstring[]Search keywords.
+categorystringPlugin category.
+tagsstring[]Additional tags.
+Component path fields
+These tell the CLI where to find your plugin's components. All are optional. The CLI uses default conventions if omitted.
+FieldTypeDefaultDescription
+agentsstring | string[]agents/Path(s) to agent directories (.agent.md files).
+skillsstring | string[]skills/Path(s) to skill directories (SKILL.md files).
+commandsstring | string[]—Path(s) to command directories.
+hooksstring | object—Path to a hooks config file, or an inline hooks object.
+extensionsstring | string[] | object—Path(s) to extension directories. Use { paths: [...], exclusive: true } to suppress built-in extensions.
+mcpServersstring | object—Path to an MCP config file (e.g., .mcp.json), or inline server definitions.
+lspServersstring | object—Path to an LSP config file, or inline server definitions.
+Example plugin.json file
+JSON
+{ "name": "my-dev-tools", "description": "React development utilities", "version": "1.2.0", "author": { "name": "Jane Doe", "email": "jane@example.com" }, "license": "MIT", "keywords": ["react", "frontend"], "agents": "agents/", "skills": ["skills/", "extra-skills/"], "hooks": "hooks.json", "mcpServers": ".mcp.json" }
+{ "name": "my-dev-tools", "description": "React development utilities", "version": "1.2.0", "author": { "name": "Jane Doe", "email": "jane@example.com" }, "license": "MIT", "keywords": ["react", "frontend"], "agents": "agents/", "skills": ["skills/", "extra-skills/"], "hooks": "hooks.json", "mcpServers": ".mcp.json" }
+LSP server configuration
+To include LSP (Language Server Protocol) servers in a plugin, create a lsp-config/servers.json file in the plugin directory, or specify a path or inline object using the lspServers field in plugin.json.
+Example lsp-config/servers.json (or inline via lspServers in plugin.json):
+{ "lspServers": { "my-lsp": { "command": "my-language-server", "fileExtensions": { ".myext": "mylang" } } } }
+For cross-platform support, use bash and powershell instead of command:
+{ "lspServers": { "my-lsp": { "bash": "${PLUGIN_ROOT}/scripts/start-lsp.sh", "powershell": "${PLUGIN_ROOT}/scripts/start-lsp.ps1", "fileExtensions": { ".myext": "mylang" } } } }
+FieldTypeRequiredDescription
+commandstring*Executable to launch the language server.
+bashstring*Bash script to launch the server (Linux/macOS); executed via bash -c SCRIPT.
+powershellstring*PowerShell script to launch the server (Windows); executed via pwsh -c SCRIPT.
+cwdstringNoWorking directory. Absolute or relative to the configuration file. Supports ${PLUGIN_ROOT}.
+argsstring[]NoArguments to pass to command (ignored for bash and powershell).
+envobjectNoEnvironment variables to set when spawning the server.
+fileExtensionsobjectYesMap of file extensions to language IDs (for example, { ".ts": "typescript" }).
+rootUristringNoProject root relative to the git root (default: .).
+initializationOptionsanyNoOptions sent to the server in the LSP initialize request.
+(*) At least one of command, bash, or powershell is required. When both bash and powershell are specified, the platform-appropriate one is selected automatically (PowerShell on Windows, Bash elsewhere).
+Use ${PLUGIN_ROOT} to reference paths within the plugin directory.
+marketplace.json
+You can create a plugin marketplace—which people can use to discover and install your plugins—by creating a marketplace.json file and saving it to the .github/plugin/ directory of the repository. You can also store the marketplace.json file in your local file system. For example, saving the file as /PATH/TO/my-marketplace/.github/plugin/marketplace.json allows you to add it to the CLI using the following command:
+copilot plugin marketplace add /PATH/TO/my-marketplace
+Note
+Copilot CLI also looks for the marketplace.json file in the .claude-plugin/ directory.
+For more information, see Creating a plugin marketplace for GitHub Copilot CLI.
+Example marketplace.json file
+JSON
+{ "name": "my-marketplace", "owner": { "name": "Your Organization", "email": "plugins@example.com" }, "metadata": { "description": "Curated plugins for our team", "version": "1.0.0" }, "plugins": [ { "name": "frontend-design", "description": "Create a professional-looking GUI ...", "version": "2.1.0", "source": "./plugins/frontend-design" }, { "name": "security-checks", "description": "Check for potential security vulnerabilities ...", "version": "1.3.0", "source": "./plugins/security-checks" } ] }
+{ "name": "my-marketplace", "owner": { "name": "Your Organization", "email": "plugins@example.com" }, "metadata": { "description": "Curated plugins for our team", "version": "1.0.0" }, "plugins": [ { "name": "frontend-design", "description": "Create a professional-looking GUI ...", "version": "2.1.0", "source": "./plugins/frontend-design" }, { "name": "security-checks", "description": "Check for potential security vulnerabilities ...", "version": "1.3.0", "source": "./plugins/security-checks" } ] }
+Note
+The value of the source field for each plugin is the path to the plugin's directory, relative to the root of the repository. It is not necessary to use ./ at the start of the path. For example, "./plugins/plugin-name" and "plugins/plugin-name" resolve to the same directory.
+marketplace.json fields
+Top-level fields
+FieldTypeRequiredDescription
+namestringYesKebab-case marketplace name. Max 64 chars.
+ownerobjectYes{ name, email? } — marketplace owner info.
+pluginsarrayYesList of plugin entries (see the table below).
+metadataobjectNo{ description?, version?, pluginRoot? }
+Plugin entry fields (objects within the plugins array)
+FieldTypeRequiredDescription
+namestringYesKebab-case plugin name. Max 64 chars.
+sourcestring | objectYesWhere to fetch the plugin (relative path, GitHub, or URL).
+descriptionstringNoPlugin description. Max 1024 chars.
+versionstringNoPlugin version.
+authorobjectNo{ name, email?, url? }
+homepagestringNoPlugin homepage URL.
+repositorystringNoSource repository URL.
+licensestringNoLicense identifier.
+keywordsstring[]NoSearch keywords.
+categorystringNoPlugin category.
+tagsstring[]NoAdditional tags.
+commandsstring | string[]NoPath(s) to command directories.
+agentsstring | string[]NoPath(s) to agent directories.
+skillsstring | string[]NoPath(s) to skill directories.
+hooksstring | objectNoPath to hooks config or inline hooks object.
+mcpServersstring | objectNoMCP servers to activate when the plugin is installed. Accepts an inline server map or a path to a JSON config file. Used when the plugin source does not ship its own MCP configuration.
+lspServersstring | objectNoPath to LSP config or inline server definitions.
+strictbooleanNoWhen true (the default), plugins must conform to the full schema and validation rules. When false, relaxed validation is used, allowing more flexibility—especially for direct installs or legacy plugins.
+File locations
+ItemPath
+Installed plugins~/.copilot/installed-plugins/MARKETPLACE/PLUGIN-NAME (installed via a marketplace) and ~/.copilot/installed-plugins/_direct/SOURCE-ID/ (installed directly)
+Marketplace cachePlatform cache directory: ~/.cache/copilot/marketplaces/ (Linux), ~/Library/Caches/copilot/marketplaces/ (macOS). Overridable with COPILOT_CACHE_HOME.
+Plugin manifest.plugin/plugin.json, plugin.json, .github/plugin/plugin.json, or .claude-plugin/plugin.json (checked in this order)
+Marketplace manifestmarketplace.json, .plugin/marketplace.json, .github/plugin/marketplace.json, or .claude-plugin/marketplace.json (checked in this order)
+Agentsagents/ (default, overridable in manifest)
+Skillsskills/ (default, overridable in manifest)
+Hooks configurationhooks.json or hooks/hooks.json
+MCP configuration.mcp.json, .github/mcp.json
+LSP configurationlsp.json or .github/lsp.json
+Plugin data${COPILOT_PLUGIN_DATA} (also available as ${CLAUDE_PLUGIN_DATA}). Points to a persistent, writable directory unique to each installed plugin. Use this for plugin-specific runtime data instead of paths inside the installed-plugins cache directory.
+Loading order and precedence
+If you install multiple plugins it's possible that some custom agents, skills, MCP servers, or tools supplied via MCP servers have duplicate names. In this situation, the CLI determines which component to use based on a precedence order.
+Agents and skills use first-found-wins precedence.
+If you have a project-level custom agent or skill with the same name or ID as one in a plugin you install, the agent or skill in the plugin is silently ignored. The plugin cannot override project-level or personal configurations. Custom agents are deduplicated using their ID, which is derived from its file name (for example, if the file is named reviewer.agent.md, the agent ID is reviewer). Skills are deduplicated by their name field inside the SKILL.md file.
+MCP servers use last-wins precedence.
+If you install a plugin that defines an MCP server with the same server name as an MCP server you have already installed, the plugin's definition takes precedence. You can use the --additional-mcp-config command-line option to override an MCP server configuration with the same name, installed using a plugin.
+Built-in tools and agents are always present and cannot be overridden by user-defined components.
+The following diagram illustrates the loading order and precedence rules.
+┌──────────────────────────────────────────────────────────────────┐ │ BUILT-IN - HARDCODED, ALWAYS PRESENT │ │ • tools: bash, view, apply_patch, glob, rg, task, ... │ │ • agents: explore, task, code-review, general-purpose, research │ └────────────────────────┬─────────────────────────────────────────┘ │ ┌──────────────────────▼──────────────────────────────────────────────┐ │ CUSTOM AGENTS - FIRST LOADED IS USED (dedup by ID) │ │ 1. ~/.copilot/agents/ (user, .github convention) │ │ 2. <project>/.github/agents/ (project) │ │ 3. <parents>/.github/agents/ (inherited, monorepo) │ │ 4. <project>/.claude/agents/ (project) │ │ 5. <parents>/.claude/agents/ (inherited, monorepo) │ │ 6. PLUGIN: agents/ dirs (plugin, by install order) │ │ 7. Remote org/enterprise agents (remote, via API) │ └──────────────────────┬──────────────────────────────────────────────┘ │ ┌──────────────────────▼──────────────────────────────────────────────┐ │ AGENT SKILLS - FIRST LOADED IS USED (dedup by name) │ │ 1. <project>/.github/skills/ (project) │ │ 2. <project>/.agents/skills/ (project) │ │ 3. <project>/.claude/skills/ (project) │ │ 4. <parents>/.github/skills/ etc. (inherited) │ │ 5. ~/.copilot/skills/ (personal-copilot) │ │ 6. ~/.agents/skills/ (personal-agents) │ │ 7. PLUGIN: skills/ dirs (plugin) │ │ 8. COPILOT_SKILLS_DIRS env + config (custom) │ │ --- then commands (.claude/commands/), skills override commands ---│ └──────────────────────┬──────────────────────────────────────────────┘ │ ┌──────────────────────▼──────────────────────────────────────────────┐ │ MCP SERVERS - LAST LOADED IS USED (dedup by server name) │ │ 1. ~/.copilot/mcp-config.json (lowest priority) │ │ 2. PLUGIN: MCP configs (plugins) │ │ 3. --additional-mcp-config flag (highest priority) │ └─────────────────────────────────────────────────────────────────────┘
+Further reading
+About enterprise-managed plugin standards
+GitHub Copilot CLI
+GitHub Copilot CLI command reference
+GitHub Copilot CLI programmatic reference
+Help and support
+Did you find what you needed?
+Yes No
+Privacy policy
+Help us make these docs great!
+All GitHub docs are open source. See something that's wrong or unclear? Submit a pull request.
+Make a contribution
+Learn how to contribute
+Still need help?
+Ask the GitHub community
+Contact support
+Legal
+© 2026 GitHub, Inc.
+Terms
+Privacy
+Status
+Pricing
+Expert services
+Blog

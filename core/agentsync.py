@@ -143,7 +143,14 @@ def run_adapter(adapter, ctx: Ctx, no_mcp_import: bool) -> Report:
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(prog="agentsync")
+    argv = sys.argv[1:] if argv is None else argv
+    if argv[:1] == ["pack"]:  # sibling concern: plugin packaging (needs no config dir)
+        from core import plugpack
+        return plugpack.main(argv[1:])
+    ap = argparse.ArgumentParser(
+        prog="agentsync",
+        epilog="other commands: pack SRC [--out DIR] [--check] — package a plugin "
+               "bundle into Claude Code + Copilot plugin trees (agentsync pack --help)")
     ap.add_argument("--version", action="version", version=f"agentsync {__version__}")
     ap.add_argument("command", choices=["apply", "verify", "diff", "uninstall", "doctor", "docs"])
     ap.add_argument("--root", help="target root to write into (default: $HOME)")

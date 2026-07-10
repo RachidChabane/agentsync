@@ -1,0 +1,675 @@
+Custom agents configuration - GitHub Docs
+Skip to main content
+GitHub Docs
+Version: Free, Pro, & Team
+Search or ask Copilot
+Search or askCopilot
+Select language: current language is English
+Search or ask Copilot
+Search or askCopilot
+Open menu
+Open Sidebar
+GitHub Copilot
+Reference
+Custom agents configuration
+Home
+GitHub Copilot
+Get started
+Quickstart
+What is GitHub Copilot?
+Plans
+Features
+Best practices
+Enterprise AI governance
+Concepts
+Completions
+Code suggestions
+Code referencing
+Chat
+Agents
+Cloud agent
+About cloud agent
+Agent management
+Custom agents
+About automations
+Access management
+MCP and cloud agent
+Risks and mitigations
+Copilot CLI
+About Copilot CLI
+Comparing CLI features
+Copilot CLI in Actions
+Cancel and roll back
+Context management
+About remote control
+Custom agents
+Autonomous task completion
+Parallel task execution
+Researching with Copilot
+Session data
+About rubber duck
+LSP servers
+CLI extensions
+Tool search
+GitHub Copilot app
+Copilot in JetBrains
+Code review
+Agentic Workflows
+Copilot Memory
+Hooks
+Plugins
+Enterprise plugin standards
+Third-party coding agents
+Agent apps
+OpenAI Codex
+Anthropic Claude
+Agent skills
+Enterprise management
+Cloud and local sandboxes
+Spark
+Copilot usage metrics
+All articles
+Copilot usage metrics
+Prompting
+Prompt engineering
+Response customization
+Context
+MCP
+Spaces
+Repository indexing
+Content exclusion
+Tools
+AI tools
+About Copilot integrations
+Models
+Utility models
+Auto model selection
+FedRAMP models
+Base and LTS models
+Usage limits
+Billing
+Billing for individuals
+Billing for organizations and enterprises
+Budgets
+Individual plans
+Organizations and enterprises
+Copilot-only enterprises
+Policies
+MCP management
+Network settings
+New features and models
+How-tos
+Copilot on GitHub
+Set up Copilot
+Enable Copilot
+Set up for self
+Set up for organization
+Set up for enterprise
+Set up a dedicated enterprise
+Set up for students
+Set up for teachers and OS maintainers
+Configure access to AI models
+Configure automatic review
+Configure runners
+Chat with Copilot
+Get started with chat
+Chat in GitHub
+Chat in Mobile
+Customize Copilot
+Customize Copilot overview
+Add custom instructions
+Add personal instructions
+Add repository instructions
+Add organization instructions
+Customize cloud agent
+Create custom agents
+Add agent skills
+Use hooks
+Customize the agent environment
+Configure secrets and variables
+Customize the agent firewall
+Test custom agents
+Configure MCP servers
+Spaces
+Create Copilot Spaces
+Collaborate with others
+Copilot for GitHub tasks
+Use Copilot to create or update issues
+Create a PR summary
+Use the GitHub MCP Server from Copilot Chat
+Use Copilot agents
+Get started
+Kick off a task
+Research, plan, iterate
+Manage agent sessions
+Copilot code review
+Review Copilot output
+Set up
+Set up for self
+Install Copilot extension
+Get code suggestions
+Get IDE code suggestions
+Find matching code
+Chat with Copilot
+Get started with Chat in your IDE
+Chat in IDE
+Chat in Windows Terminal
+Copilot CLI
+All articles
+Copilot CLI quickstart
+Copilot CLI best practices
+Set up Copilot CLI
+Install Copilot CLI
+Authenticate Copilot CLI
+Configure Copilot CLI
+Add LSP servers
+Troubleshoot Copilot CLI auth
+Use Copilot CLI
+Overview
+Allowing tools
+Voice input
+Connect to VS Code
+Delegate tasks to Copilot
+Browse issues, PRs, gists
+Roll back changes
+Invoke custom agents
+Steer agents
+Steer a session remotely
+Set an AI credit limit
+Agentic code review
+Manage pull requests
+Speed up task completion
+Use session data
+Automate with Copilot CLI
+Quickstart
+Run the CLI programmatically
+Schedule prompts
+Automate with Actions
+Customize Copilot CLI
+Overview
+Add custom instructions
+Change settings
+Use hooks
+Add agent skills
+Add MCP servers
+Create custom agents
+Use your own model provider
+Plugins: Find and install
+Plugins: Create a plugin
+Plugins: Create a marketplace
+Administer for enterprise
+Copilot CLI in Actions
+Cloud and local sandboxes for GitHub Copilot
+Enable or disable cloud sandboxes
+Configure local sandbox
+GitHub Copilot app
+All articles
+Quickstart
+Customize the GitHub Copilot app
+Agent sessions
+Canvas extensions
+Managing issues and pull requests
+Automations
+Use your own model provider
+Open with deep links
+Copilot SDK
+Authentication
+Authenticate
+BYOK
+Features
+Agent Loop
+Cloud Sessions
+Custom Agents
+Fleet Mode
+Hooks
+Image Input
+MCP
+Plugin Directories
+Remote Sessions
+Session limits
+Session Persistence
+Skills
+Steering And Queueing
+Streaming Events
+Getting Started
+Use hooks
+Error Handling
+Hooks Overview
+Post Tool Use
+Pre Tool Use
+Session Lifecycle
+User Prompt Submitted
+Integrations
+Microsoft Agent Framework
+Observability
+Opentelemetry
+Set up Copilot SDK
+Azure Managed Identity
+Backend Services
+Bundled CLI
+Choosing A Setup Path
+GitHub OAuth
+Local CLI
+Multi Tenancy
+Scaling
+Troubleshooting
+Compatibility
+Debugging
+MCP Debugging
+GitHub Agentic Workflows
+Quickstart
+Creating agentic workflows
+Use Copilot agents
+Cloud agent
+Start Copilot sessions
+Create cloud automations
+Changing the AI model
+Configuring agent settings
+Create custom agents in your IDE
+Use cloud agent on GitHub
+Use cloud agent on GitHub Mobile
+Use agent apps
+Use cloud agent in your IDE
+Use cloud agent via the API
+Use cloud agent from the GitHub CLI
+Use cloud agent via GitHub MCP Server
+Integrate cloud agent with Jira
+Integrate cloud agent with Slack
+Integrate cloud agent with Teams
+Integrate cloud agent with Linear
+Integrate cloud agent with Azure Boards
+Use cloud agent from Raycast
+Troubleshoot cloud agent
+Request a code review
+Use code review
+Copilot Memory
+Manage for yourself
+Manage as administrator
+Use AI models
+Change the chat model
+Change the completion model
+Provide context
+Use Copilot Spaces
+Use Copilot Spaces
+Use MCP in your IDE
+Extend Copilot Chat with MCP
+Set up the GitHub MCP Server
+Enterprise configuration
+Configure toolsets
+Use the GitHub MCP Server
+Change MCP registry
+Configure custom instructions
+Add repository instructions in your IDE
+Configure content exclusion
+Exclude content from Copilot
+Review changes
+Use Copilot for common tasks
+Use Copilot in the CLI
+Configure personal settings
+Configure network settings
+Configure in IDE
+Authenticate to GHE.com
+Manage and track spending
+Monitor AI credits usage
+Manage company spending
+Manage your account
+Get started with a Copilot plan
+View and change your Copilot plan
+Disable Copilot Free
+Manage policies
+Administer Copilot
+Manage for organization
+Manage plan
+Cancel
+Manage access
+Grant access
+Manage requests for access
+Revoke access
+Manage network access
+Manage policies
+Add Copilot cloud agent
+Configure agent runners
+Prepare for custom agents
+Manage default models
+Review activity
+Review user activity data
+Use your own API keys
+Manage for enterprise
+Manage plan
+Subscribe
+Cancel plan
+Upgrade plan
+Downgrade subscription
+Manage access
+Grant access
+Disable for organizations
+View license usage
+Manage network access
+Manage enterprise policies
+Manage agents
+Prepare for custom agents
+Create github-private repository
+Enterprise managed settings
+Monitor agentic activity
+Enable Copilot cloud agent
+Block agentic features
+Enable Copilot code review
+Manage Spark
+Manage model availability
+Use your own API keys
+Review audit logs
+Manage MCP usage
+Configure MCP registry
+Configure MCP server access
+Download activity report
+View usage and adoption
+View code generation
+Troubleshoot Copilot
+Troubleshoot common issues
+View logs
+Troubleshoot firewall settings
+Troubleshoot network errors
+Troubleshoot Spark
+Troubleshoot slow responses
+Reference
+Chat cheat sheet
+Customization cheat sheet
+AI models
+Supported models
+Model comparison
+Model hosting
+Copilot feature matrix
+Keyboard shortcuts
+Copilot CLI reference
+CLI command reference
+CLI plugin reference
+CLI programmatic reference
+ACP server
+CLI configuration directory
+Custom agents configuration
+Custom instructions support
+Hooks reference
+Policy conflicts
+Supported surfaces for policies
+Managed settings reference
+Copilot allowlist reference
+MCP allowlist enforcement
+Metrics data
+Copilot billing
+Models and pricing
+Billing cycle
+Seat assignment
+License changes
+Azure billing
+Request-based billing (legacy)
+What changed with billing (legacy)
+Copilot requests (legacy)
+Billing overview (legacy)
+Monitor premium requests (legacy)
+Model multipliers for annual plans (legacy)
+Agentic audit log events
+Agent session filters
+Review excluded files
+Copilot usage metrics
+Copilot usage metrics data
+Interpret usage metrics
+Reconciling Copilot usage metrics
+Copilot LoC metrics
+Team-level metrics
+Example schema
+Tutorials
+All tutorials
+GitHub Copilot Cookbook
+All prompts
+Communicate effectively
+Create templates
+Summarize repository activity
+Synthesize research
+Create diagrams
+Generate tables
+Debug errors
+Debug invalid JSON
+Handle API rate limits
+Diagnose CI test failures
+Analyze functionality
+Explore implementations
+Analyze feedback
+Generate code
+Implement a feature
+Refactor code
+Improve code readability
+Fix lint errors
+Refactor for optimization
+Refactor for sustainability
+Refactor design patterns
+Refactor data access layers
+Decouple business logic
+Handle cross-cutting
+Simplify inheritance hierarchies
+Fix database deadlocks
+Translate code
+Document code
+File issues without breaking flow
+Document legacy code
+Explain legacy code
+Explain complex logic
+Sync documentation
+Write discussions or blog posts
+Testing code
+Generate unit tests
+Create mock objects
+Create end-to-end tests
+Update unit tests
+Analyze security
+Secure your repository
+Manage dependency updates
+Find vulnerabilities
+Customization library
+All customizations
+Custom instructions
+Your first custom instructions
+Concept explainer
+Debugging tutor
+Code reviewer
+GitHub Actions helper
+Pull request assistant
+Issue manager
+Accessibility auditor
+Testing automation
+Prompt files
+Your first prompt file
+Create README
+Onboarding plan
+Document API
+Review code
+Generate unit tests
+Custom agents
+Your first custom agent
+Implementation planner
+Bug fix teammate
+Cleanup specialist
+Cloud agent
+Get the best results
+Pilot cloud agent
+Improve a project
+Build guardrails
+Give access to resources
+Set up budgets
+Get started with budgets
+Optimize budget configuration
+Spark
+Your first spark
+Prompt tips
+Build and deploy apps
+Deploy from CLI
+Customize code review
+Enhance agent mode with MCP
+Compare AI models
+Speed up development work
+Roll out at scale
+Assign licenses
+Choose enterprise plan
+Set up self-serve licenses
+Track usage and adoption
+Remind inactive users
+Govern at scale
+Resources for approval
+Establish AI managers
+Govern for adoption
+Pilot a feature or model
+Maintain codebase standards
+Enable developers
+Drive adoption
+Integrate AI agents
+Drive downstream impact
+Achieve company goals
+Increase test coverage
+Accelerate pull requests
+Reduce security debt
+Measure trial success
+Explore a codebase
+Explore issues and discussions
+Explore pull requests
+Write tests
+Refactor code
+Optimize AI usage
+Optimize code reviews
+Reduce technical debt
+Review AI code
+Learn a new language
+Modernize legacy code
+Modernize Java applications
+Migrate a project
+Plan a project
+Vibe coding
+Upgrade projects
+Use hooks with Copilot CLI
+Use an AI SME
+Create CLI extensions
+Responsible use
+Chat
+Inline suggestions
+Agents
+GitHub Copilot
+Reference
+Custom agents configuration
+Custom agents configuration
+Reference for configuring custom agents.
+Copy as Markdown
+In this article
+YAML frontmatter properties
+Tools
+MCP server configuration details
+Example agent profile configurations
+Processing of custom agents
+Further reading
+This reference article provides detailed configuration information for custom agents. For general information about creating custom agents, see Creating custom agents for Copilot cloud agent.
+Note
+Custom agents are in public preview for JetBrains IDEs, Eclipse, and Xcode, and subject to change.
+YAML frontmatter properties
+The following table outlines the properties that you can configure for agent profiles in GitHub.com, the Copilot CLI, and supported IDEs (unless otherwise noted). Any environment-specific behavior is noted in the property description. The configuration file's name (minus .md or .agent.md) is used for deduplication between levels so that the lowest level configuration takes precedence.
+PropertyTypePurpose
+namestringDisplay name for the custom agent. Optional.
+descriptionRequired stringDescription of the custom agent's purpose and capabilities
+targetstringTarget environment or context for the custom agent (vscode or github-copilot). If unset, defaults to both environments.
+toolslist of strings, stringList of tool names the custom agent can use. Supports both a comma separated string and yaml string array. If unset, defaults to all tools. See Tools.
+modelstringModel to use when this custom agent executes. If unset, inherits the default model.
+disable-model-invocationbooleanDisables Copilot cloud agent from automatically using this custom agent based on task context. When true, the agent must be manually selected. Setting disable-model-invocation: true is equivalent to infer: false. If both are set, disable-model-invocation takes precedence. If unset, defaults to false.
+user-invocablebooleanControls whether this custom agent can be selected by a user. When false, the agent cannot be manually selected and can only be accessed programmatically. If unset, defaults to true.
+inferbooleanRetired. Use disable-model-invocation and user-invocable instead. Enables Copilot cloud agent to automatically use this custom agent based on task context. When false, the agent must be manually selected. If unset, defaults to true.
+mcp-serversobjectAdditional MCP servers and tools that should be used by the custom agent. Not used in VS Code and other IDE custom agents.
+metadataobject consisting of a name and value pair, both stringsAllows annotation of the agent with useful data. Not used in VS Code and other IDE custom agents.
+Define the agent's behavior, expertise, and instructions in the Markdown content below the YAML frontmatter. The prompt can be a maximum of 30,000 characters.
+Note
+The argument-hint and handoffs properties from VS Code and other IDE custom agents are currently not supported for Copilot cloud agent on GitHub.com. They are ignored to ensure compatibility.
+For more information on custom agent file structure in VS Code, see Custom agents in VS Code in the VS Code documentation.
+Tools
+The custom agent tools property controls which tools are available to your agent, including those from MCP servers.
+Your custom agent will have access to MCP server tools that have been configured in both its agent profile and/or the repository settings. For more information on configuring shared repository MCP servers on GitHub, see Configure MCP servers for your repository.
+You can configure tools using the following approaches:
+Enable all available tools: Omit the tools property entirely or use tools: ["*"] to enable all available tools. This will include all MCP server tools configured in the agent profile and/or repository settings.
+Enable specific tools: Provide a list of specific tool names or aliases (for example, tools: ["read", "edit", "search"]) to enable only those tools. For available tool aliases, see Tool aliases below.
+Note that if your repository has MCP servers configured, you can choose to make only specific tools from those servers available to your custom agent. Tool names from specific MCP servers can be prefixed with the server name followed by a /. For example, some-mcp-server/some-tool.
+You can also explicitly enable all tools from a specific MCP server using some-mcp-server/*.
+Tools from VS Code extensions can use the extension name as a proxy, like azure.some-extension/some-tool.
+Disable all tools: Use an empty list (tools: []) to disable all tools for the agent.
+All unrecognized tool names are ignored, which allows product-specific tools to be specified in an agent profile without causing problems.
+Tool aliases
+The following tool aliases are available for custom agents. All aliases are case insensitive:
+Primary aliasCompatible aliasesCloud agent mappingPurpose
+executeshell, Bash, powershellShell tools: bash or powershellExecute a command in the appropriate shell for the operating system.
+readRead, NotebookReadviewRead file contents.
+editEdit, MultiEdit, Write, NotebookEditEdit tools: e.g. str_replace, str_replace_editorAllow LLM to edit. Exact arguments can vary.
+searchGrep, GlobsearchSearch for files or text in files.
+agentcustom-agent, Task"Custom agent" toolsAllows a different custom agent to be invoked to accomplish a task.
+webWebSearch, WebFetchCurrently not applicable for cloud agent.Allows fetching content from URLs and performing a web search
+todoTodoWriteCurrently not applicable for cloud agent.Creates and manages structured task lists. Not supported in cloud agent today, but supported by VS Code.
+Tool names for "out-of-the-box" MCP servers
+The following MCP servers are available out-of-box for Copilot cloud agent and can be referenced using namespacing:
+MCP server nameAvailable tools
+githubAll read-only tools are available by default, but the token the server receives is scoped to the source repository. github/* includes all of them, or you can reference github/<tool name> where <tool name> is a value from the MCP server documentation.
+playwrightAll playwright tools are available by default, but the server is configured to only access localhost. playwright/* includes all of them, or you can reference playwright/<tool name> where <tool name> is a value from the MCP server documentation. By default the token it has access to is scoped to the source code repository.
+MCP server configuration details
+The following sample agent profile shows an agent with an MCP server and a secret configured. Additionally, only one tool from the MCP server has been enabled in the tools property in the YAML frontmatter:
+--- name: my-custom-agent-with-mcp description: Custom agent description tools: ['tool-a', 'tool-b', 'custom-mcp/tool-1'] mcp-servers: custom-mcp: type: 'local' command: 'some-command' args: ['--arg1', '--arg2'] tools: ["*"] env: ENV_VAR_NAME: ${{ secrets.COPILOT_MCP_ENV_VAR_VALUE }} --- Prompt with suggestions for behavior and output
+The mcp-servers property in an agent profile is a YAML representation of the JSON configuration format used to configure MCP servers for repositories on GitHub.
+Most sub-properties are the same as the JSON representation. The following sections describe changes from the initial implementation of MCP configuration in repositories on GitHub that are relevant to custom agents. For more information about the JSON configuration format, see Configure MCP servers for your repository.
+MCP server type
+For compatibility, the stdio type used by Claude Code and VS Code is mapped to cloud agent's local type.
+MCP server environment variables and secrets
+Note
+If your MCP server requires secrets or environment variables, these must be configured as Agents secrets or variables at either the organization or repository level. For more information, see Configure secrets and variables for Copilot cloud agent.
+Custom agent MCP configuration supports the same environment variable and secret replacement capabilities as existing repository-level MCP configurations. Similar to repository-level configurations, secrets and variables can be sourced from Agents secrets and variables for Copilot cloud agent, configured at either the organization or repository level. The syntax for referencing these values has been expanded to support common patterns used in GitHub Actions and Claude Code.
+Both the repository-level MCP JSON configuration and the custom agent YAML configuration support the following syntax patterns:
+$COPILOT_MCP_ENV_VAR_VALUE - Environment variable and header
+${COPILOT_MCP_ENV_VAR_VALUE} - Environment variable and header (Claude Code syntax)
+${COPILOT_MCP_ENV_VAR_VALUE:-default} - Environment variable and header with default
+The custom agent YAML configuration supports the following additional syntax patterns:
+${{ secrets.COPILOT_MCP_ENV_VAR_VALUE }} - Environment variable and header
+${{ vars.COPILOT_MCP_ENV_VAR_VALUE }} - Environment variable and header
+Example agent profile configurations
+The following examples demonstrate what an agent profile could look like for the common tasks of writing tests or planning the implementation of a project. For additional inspiration, see the Custom agents examples in the customization library. You can also find more specific examples in the awesome-copilot community collection.
+Testing specialist
+This example enables all tools by omitting the tools property.
+Text
+--- name: test-specialist description: Focuses on test coverage, quality, and testing best practices without modifying production code --- You are a testing specialist focused on improving code quality through comprehensive testing. Your responsibilities: - Analyze existing tests and identify coverage gaps - Write unit tests, integration tests, and end-to-end tests following best practices - Review test quality and suggest improvements for maintainability - Ensure tests are isolated, deterministic, and well-documented - Focus only on test files and avoid modifying production code unless specifically requested Always include clear test descriptions and use appropriate testing patterns for the language and framework.
+--- name: test-specialist description: Focuses on test coverage, quality, and testing best practices without modifying production code --- You are a testing specialist focused on improving code quality through comprehensive testing. Your responsibilities: - Analyze existing tests and identify coverage gaps - Write unit tests, integration tests, and end-to-end tests following best practices - Review test quality and suggest improvements for maintainability - Ensure tests are isolated, deterministic, and well-documented - Focus only on test files and avoid modifying production code unless specifically requested Always include clear test descriptions and use appropriate testing patterns for the language and framework.
+Implementation planner
+This example only enables a subset of tools.
+Text
+--- name: implementation-planner description: Creates detailed implementation plans and technical specifications in markdown format tools: ["read", "search", "edit"] --- You are a technical planning specialist focused on creating comprehensive implementation plans. Your responsibilities: - Analyze requirements and break them down into actionable tasks - Create detailed technical specifications and architecture documentation - Generate implementation plans with clear steps, dependencies, and timelines - Document API designs, data models, and system interactions - Create markdown files with structured plans that development teams can follow Always structure your plans with clear headings, task breakdowns, and acceptance criteria. Include considerations for testing, deployment, and potential risks. Focus on creating thorough documentation rather than implementing code.
+--- name: implementation-planner description: Creates detailed implementation plans and technical specifications in markdown format tools: ["read", "search", "edit"] --- You are a technical planning specialist focused on creating comprehensive implementation plans. Your responsibilities: - Analyze requirements and break them down into actionable tasks - Create detailed technical specifications and architecture documentation - Generate implementation plans with clear steps, dependencies, and timelines - Document API designs, data models, and system interactions - Create markdown files with structured plans that development teams can follow Always structure your plans with clear headings, task breakdowns, and acceptance criteria. Include considerations for testing, deployment, and potential risks. Focus on creating thorough documentation rather than implementing code.
+Processing of custom agents
+Custom agents names
+In the case of naming conflicts, the lowest level configuration overrides higher-level configurations. This means that a repository-level agent would take precedence over an organization-level agent, and the organization-level agent would override an enterprise-level agent.
+Versioning
+Custom agent versioning is based on Git commit SHAs for the agent profile file. This allows you to create branches or tags with different versions of custom agents as needed. When you assign a custom agent to a task, the custom agent will be instantiated using the latest version of the agent profile for that repository and branch. When the agent creates a pull request, interactions within the pull request use the same version of the custom agent for consistency.
+Tools processing
+The tools list filters the set of tools that are made available to the agent - whether built-in or sourced from MCP servers. When you configure tools in your agent profile, the behavior depends on what you specify:
+If no tools are specified, all available tools are enabled
+An empty tools list (tools: []) disables all tools
+A specific list (tools: [...]) enables only those tools
+MCP server configurations
+For MCP server configurations, there is a specific processing order that ensures proper override behavior: out-of-the-box MCP configurations (like the GitHub MCP) are processed first, followed by the custom agent MCP configuration, and finally MCP configurations specified through repository settings. This allows each level to override settings from the previous level as appropriate.
+Further reading
+GitHub Copilot CLI
+GitHub Copilot CLI command reference
+Help and support
+Did you find what you needed?
+Yes No
+Privacy policy
+Help us make these docs great!
+All GitHub docs are open source. See something that's wrong or unclear? Submit a pull request.
+Make a contribution
+Learn how to contribute
+Still need help?
+Ask the GitHub community
+Contact support
+Legal
+© 2026 GitHub, Inc.
+Terms
+Privacy
+Status
+Pricing
+Expert services
+Blog

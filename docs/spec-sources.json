@@ -7,5 +7,7 @@
   "cursor": ["https://cursor.com/docs/mcp.md", "https://cursor.com/docs/rules.md"],
   "windsurf": ["https://docs.windsurf.com/windsurf/cascade/mcp", "https://docs.windsurf.com/windsurf/cascade/memories"],
   "zed": ["https://raw.githubusercontent.com/zed-industries/zed/main/docs/src/ai/mcp.md", "https://raw.githubusercontent.com/zed-industries/zed/main/docs/src/ai/rules.md"],
-  "cline": ["https://docs.cline.bot/mcp/configuring-mcp-servers", "https://docs.cline.bot/customization/cline-rules"]
+  "cline": ["https://docs.cline.bot/mcp/configuring-mcp-servers", "https://docs.cline.bot/customization/cline-rules"],
+  "claude-plugins": ["https://code.claude.com/docs/en/plugins-reference.md", "https://code.claude.com/docs/en/plugin-marketplaces.md", "https://code.claude.com/docs/en/sub-agents.md"],
+  "copilot-plugins": ["https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference", "https://docs.github.com/en/copilot/reference/custom-agents-configuration", "https://code.visualstudio.com/docs/copilot/customization/custom-agents"]
 }

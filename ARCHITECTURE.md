@@ -87,6 +87,35 @@ snapshots each adapter's primary-source doc pages (`docs/spec-sources.json` →
 the text diff. Detection is deterministic and token-free; only the judgment step (does
 this change affect an adapter?) involves a human or agent. Same split as everywhere else.
 
+## Sibling concerns share plumbing, not an engine
+
+`plugpack.py` (v0.3) is a second concern: it packages one canonical plugin bundle into
+Claude Code's and GitHub Copilot's native plugin/marketplace formats. Same thesis as
+config-sync — one source, N tool-native renderings — deliberately **not** the same
+machinery, because the problem shape differs:
+
+- Config-sync *reconciles live files it shares with the user* — Merge/`.bak`/surgical
+  uninstall earn their keep — and never transforms content (a skill is a symlink, MCP a
+  fixed render). Packaging is *lossy content transformation* into an output tree the
+  packager owns wholesale: uninstall is deleting `dist/`, drift is `pack --check` (or
+  `git diff --exit-code` where `dist/` is committed).
+- **Shared:** the low-level plumbing (`util.dump`/`load_json`, `targets.udiff`),
+  spec-watch (the plugin-format doc pages are just two more `spec-sources.json`
+  entries), and the mechanism/policy principle. The rest of plugpack is net-new domain
+  knowledge — the tool-name map, the warn-never-silent drop policy, the two MCP
+  dialects. Forcing that through the reconciler would have bought only commodity
+  plumbing at the price of a grand unified schema (deliberately deferred, below).
+- **No Adapter ABC for two targets.** Per-tool knowledge lives in one module as a
+  `TOOLMAP` dict + per-tool render branches; the `FileHarness` base earns itself at
+  eight config harnesses, not two plugin targets. Extract a base when a genuinely
+  divergent third target exists.
+
+The seam for a third concern (another "one source → N tools" standard): a new
+`core/<concern>.py` owning its verbs (`main(argv)`), one early-dispatch line in
+`agentsync.main`, a test file in the Makefile gate, and its primary-source pages in
+`spec-sources.json`. Nothing else changes — concerns are siblings behind one front
+door, not plugins of a framework.
+
 ### Enforcement is layered, and honest about its limits
 
 | Layer | Mechanism | Guarantees |

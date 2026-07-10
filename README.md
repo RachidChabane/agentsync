@@ -42,6 +42,7 @@ repo's `config/`):
 | `agentsync uninstall` | remove only what agentsync added; restore `.bak` originals |
 | `agentsync doctor` | health check: harnesses, runners, PATH, MCP auth, drift, broken links |
 | `agentsync docs` | regenerate the inventory docs (also runs automatically on every `apply`) |
+| `agentsync pack SRC` | package one plugin bundle into Claude Code + Copilot marketplace trees (`--check` gates CI) |
 
 `--root DIR` targets a sandbox instead of `$HOME`; `--harness NAME` limits scope.
 `verify --json` / `diff --json` emit machine-readable output (same exit codes) for CI
@@ -56,6 +57,26 @@ share: `CLAUDE.md` + `.mcp.json`, `.github/copilot-instructions.md`, `opencode.j
 auth renders as `${ENV_VAR}` headers, never this machine's values. `verify --project
 --json` in CI fails the PR when someone hand-edits a rendered file (see `docs/ci.md`).
 User-scope concerns (skills, hooks, inventory docs) deliberately stay in `$HOME`.
+
+### Plugin packaging (one bundle → every marketplace)
+
+```bash
+agentsync pack examples/demo-bundle           # -> examples/demo-bundle/dist/{claude,copilot}
+agentsync pack examples/demo-bundle --check   # CI: exit 1 if dist/ drifted from the bundle
+```
+
+The same thesis applied to the emerging plugin/marketplace standards: one canonical
+bundle — skills (Agent Skills standard, copied byte-for-byte), agents whose tool grants
+are written **once** in a neutral vocabulary, optional commands and MCP servers —
+renders into each tool's native plugin + marketplace format: Claude Code
+(`.claude-plugin/`, bare-key `.mcp.json`) and GitHub Copilot CLI / VS Code
+(`.github/plugin/`, `mcpServers`-wrapped). Each output tree is a directly installable
+marketplace: `claude plugin marketplace add dist/claude`, `copilot plugin marketplace
+add dist/copilot`. Lossy translations (a Claude-only `model` alias, VS-Code-only
+`handoffs`, an unmappable tool id) always **warn**, never degrade silently; `--strict`
+turns warnings into exit 2. Bundle layout and the neutral tool vocabulary are in
+`core/plugpack.py`'s docstring; every format fact was verified against primary sources
+and those pages are spec-watched (below).
 
 ## What agentsync owns vs preserves
 

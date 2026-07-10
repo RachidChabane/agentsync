@@ -7,6 +7,8 @@ __pycache__/
 # Python packaging artifacts (pyproject.toml build)
 /build/
 /dist/
+# packed plugin output of the example bundles (agentsync pack's default --out)
+/examples/*/dist/
 *.egg-info/
 *.bak
 *.bak[0-9]*

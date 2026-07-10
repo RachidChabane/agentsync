@@ -1,0 +1,7 @@
+{
+  "name": "demo",
+  "description": "agentsync plugpack demo: one skill (verbatim), one clean agent, one lossy agent, a command, and a bundled MCP server",
+  "version": "0.1.0",
+  "owner": { "name": "agentsync" },
+  "license": "MIT"
+}
