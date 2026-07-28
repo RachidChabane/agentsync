@@ -1,5 +1,7 @@
-# Your private policy lives here (copied from config.example by init). Never published.
-/config/
+# Your private policy lives here (copied from config.example by init, or symlinked to a
+# private config repo). Never published. No trailing slash: git lstats a symlink as a
+# file, so `/config/` would leave the link itself untracked and leak its target path.
+/config
 
 __pycache__/
 *.pyc
