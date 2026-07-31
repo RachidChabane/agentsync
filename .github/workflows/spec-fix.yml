@@ -30,7 +30,7 @@ jobs:
             echo "skip=1" >> "$GITHUB_OUTPUT"
             echo "No CLAUDE_CODE_OAUTH_TOKEN secret — leaving the issue for a human. (Enable: run 'claude setup-token' locally, add the repo secret.)"
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: steps.tok.outputs.skip != '1'
       - uses: anthropics/claude-code-action@v1
         if: steps.tok.outputs.skip != '1'
