@@ -41,7 +41,7 @@ class OpenCode(Adapter):
         base = ctx.root / ".config" / "opencode"
         servers = {n: mcp_entry(s) for n, s in ctx.servers.items()}
         skill_perms = {"*": "allow"}
-        skill_perms.update({s: "deny" for s, t in ctx.skills.items() if t in HIDDEN_TIERS})
+        skill_perms.update({s: "deny" for s, t in ctx.tiers_for(self.name).items() if t in HIDDEN_TIERS})
         extra_owned, extra_hooks = self._passthrough(ctx)
         return [
             Merge(base / "opencode.json",

@@ -186,6 +186,7 @@ def main(argv=None) -> int:
     if unknown:
         sys.exit(f"unknown harness(es): {', '.join(unknown)} (known: {', '.join(ADAPTERS)})")
     norm = skillmod.normalize(skills_cfg)
+    skillmod.validate(norm, list(ADAPTERS))
     # Skills are user-scope (symlinked into $HOME harness dirs) — not fetched per repo.
     skill_paths = {} if proj else \
         skillmod.resolve(norm, root / ".cache/agentsync/skills", do_fetch=(args.command == "apply"))

@@ -19,13 +19,18 @@ class Ctx:
     root: Path          # target root (default $HOME; a temp dir in tests)
     config: Path        # the config dir (holds instructions/skills/mcp/overrides + docs/)
     instructions: Path  # rendered instructions markdown
-    skills: dict        # skill name -> tier
+    skills: dict        # skill name -> tier spec (string, or harness -> tier map)
     servers: dict       # MCP servers, single-source schema
     profile: dict       # harnesses + options
     verb: str = "apply"  # apply | verify | diff | uninstall
     scope: str = "user"  # user ($HOME) | project (a repo; committed, team-shared files)
     skill_paths: dict = field(default_factory=dict)  # name -> resolved dir (or None)
     overrides: dict = field(default_factory=dict)    # harness -> extra settings keys
+
+    def tiers_for(self, harness: str) -> dict:
+        """skill name -> the tier this harness sees."""
+        from .skills import tiers_for
+        return tiers_for(self.skills, harness)
 
     @property
     def check(self) -> bool:

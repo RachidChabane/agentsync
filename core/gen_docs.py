@@ -10,6 +10,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from core.skills import DEFAULT_TIER_KEY
 from core.targets import Json, Link, Merge
 from core.util import Ctx
 
@@ -90,10 +91,17 @@ def _cmd_summary(cmd: str) -> str:
 
 # ----- per-group renderers (return the markdown body) --------------------------------
 
+def _tier_label(spec) -> str:
+    if isinstance(spec, str):
+        return spec
+    overrides = sorted((h, t) for h, t in spec.items() if h != DEFAULT_TIER_KEY)
+    return "; ".join([spec[DEFAULT_TIER_KEY]] + [f"{h}: {t}" for h, t in overrides])
+
+
 def _skills(ctx: Ctx) -> str:
     rows = []
     for name in sorted(ctx.skills):
-        tier = ctx.skills[name]
+        tier = _tier_label(ctx.skills[name])
         src = ctx.skill_paths.get(name)
         desc = fm_description(Path(src) / "SKILL.md") if src else ""
         rows.append(f"- **{name}** (`{tier}`) — {desc or '_no description_'}")

@@ -44,7 +44,7 @@ class Claude(Adapter):
     def targets(self, ctx: Ctx) -> list:
         base = ctx.root / ".claude"
         servers = {n: mcp_entry(s) for n, s in ctx.servers.items()}
-        overrides = {s: t for s, t in ctx.skills.items() if t != "on"}  # 'on' = omit
+        overrides = {s: t for s, t in ctx.tiers_for(self.name).items() if t != "on"}  # 'on' = omit
         nudge = str(ctx.enforce_dir / "session-nudge.sh")
         guard = str(ctx.enforce_dir / "guard-commit.sh")
         extra_owned, extra_hooks = self._passthrough(ctx)

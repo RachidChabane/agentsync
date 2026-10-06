@@ -33,7 +33,7 @@ class Copilot(Adapter):
     def targets(self, ctx: Ctx) -> list:
         base = ctx.root / ".copilot"
         servers = {"mcpServers": {n: mcp_entry(s) for n, s in ctx.servers.items()}}
-        hidden = sorted(s for s, t in ctx.skills.items() if t in HIDDEN_TIERS)
+        hidden = sorted(s for s, t in ctx.tiers_for(self.name).items() if t in HIDDEN_TIERS)
         nudge = str(ctx.enforce_dir / "prompt-context.sh")
         guard = str(ctx.enforce_dir / "guard-commit.sh")
         extra_owned, extra_hooks = self._passthrough(ctx)

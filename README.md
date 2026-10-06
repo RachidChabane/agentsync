@@ -175,6 +175,11 @@ concerns:
 - **Skill sourcing** — a skill entry can carry a `source` (local dir or git URL) and
   agentsync symlinks it into Claude's & Copilot's skills dirs (cloning/pulling git
   sources on apply), so skills are managed declaratively, not by hand.
+- **Per-harness tiers** — `tier` may also be a map from harness name to tier with a
+  required `"default"` key: `{"tier": {"default": "on", "claude": "off"}}`. A harness
+  uses its own entry, else `default`; unknown harnesses or tiers fail loudly. Linking
+  is independent of tier: a skill is symlinked into every harness's skills dir, and a
+  hidden tier is applied through that harness's settings.
 - **Settings passthrough** (`overrides.json`) — own arbitrary per-harness settings keys
   (plugins, status line, model effort) and add your own hooks alongside the determinism
   ones. This is what lets agentsync replace a hand-maintained config wholesale.

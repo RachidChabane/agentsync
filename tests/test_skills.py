@@ -11,11 +11,60 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
-from core import agentsync  # noqa: E402
+from core import agentsync, skills as skillmod  # noqa: E402
 
 
 def git(cwd, *args):
     subprocess.run(["git", *args], cwd=cwd, check=True, capture_output=True)
+
+
+def write_conf(tmp, skills):
+    conf = tmp / "cfg"
+    conf.mkdir(parents=True)
+    (conf / "instructions.md").write_text("# Global\nx\n")
+    (conf / "mcp.json").write_text('{"servers":{}}')
+    (conf / "profile.json").write_text('{"harnesses":["claude","copilot","opencode"]}')
+    (conf / "skills.json").write_text(json.dumps({"skills": skills}))
+    return ["--root", str(tmp / "home"), "--config", str(conf), "--no-mcp-import"]
+
+
+def rejects(argv, *fragments):
+    try:
+        agentsync.main(argv)
+    except SystemExit as e:
+        assert all(f in str(e) for f in fragments), e
+        return
+    raise AssertionError(f"expected a SystemExit mentioning {fragments}")
+
+
+def test_per_harness_tiers():
+    spec = {"default": "on", "claude": "off"}
+    assert skillmod.effective_tier(spec, "claude") == "off"
+    assert skillmod.effective_tier(spec, "copilot") == "on"
+    assert skillmod.effective_tier("name-only", "claude") == "name-only"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        common = write_conf(tmp, {"mapped": {"tier": spec}, "plain": "on",
+                                  "hidden-elsewhere": {"tier": {"default": "off", "claude": "on"}}})
+        assert agentsync.main(["apply", *common]) == 0
+        assert agentsync.main(["verify", *common]) == 0
+        home = tmp / "home"
+        claude = json.loads((home / ".claude/settings.json").read_text())
+        assert claude["skillOverrides"] == {"mapped": "off"}
+        copilot = json.loads((home / ".copilot/settings.json").read_text())
+        assert copilot["disabledSkills"] == ["hidden-elsewhere"]
+        oc = json.loads((home / ".config/opencode/opencode.json").read_text())
+        assert oc["permission"]["skill"] == {"*": "allow", "hidden-elsewhere": "deny"}
+
+    for skills, fragments in [
+        ({"s": {"tier": {"claude": "off"}}}, ("skill 's'", "default")),
+        ({"s": {"tier": {"default": "on", "nope": "off"}}}, ("unknown harness 'nope'",)),
+        ({"s": {"tier": {"default": "on", "claude": "sometimes"}}}, ("unknown tier 'sometimes'",)),
+        ({"s": "sometimes"}, ("unknown tier 'sometimes'",)),
+    ]:
+        with tempfile.TemporaryDirectory() as tmp:
+            rejects(["verify", *write_conf(Path(tmp), skills)], *fragments)
 
 
 def main():
@@ -73,6 +122,7 @@ def main():
         cs = json.loads((root / ".claude/settings.json").read_text())
         assert "effortLevel" not in cs and "Stop" not in cs.get("hooks", {}), "passthrough not removed"
 
+    test_per_harness_tiers()
     print("test_skills: PASS")
 
 

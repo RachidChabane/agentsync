@@ -148,7 +148,8 @@ judgment, not cargo-culting every pattern. Not built until the trigger fires:
 - **Claude**: user-scope MCP lives in the stateful `~/.claude.json` and can't be
   symlinked → render an artifact + import via the `claude` CLI as an isolated side step
   (skipped in `--check` and any sandbox). `skillOverrides` is the only 4-tier model;
-  others collapse to hidden/visible.
+  others collapse to hidden/visible. Each adapter renders the tier it resolves for its
+  own name (`Ctx.tiers_for`): a `tier` map's harness key, else its `"default"`.
 - **Copilot CLI**: stdin is `toolArgs` (a JSON *string*), not `tool_input.command`; its
   `sessionStart` can't inject context, so the nudge runs on `userPromptSubmitted` once
   per session (sentinel). Fail-closed harness — the gate only ever exits 0/2.
