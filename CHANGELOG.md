@@ -3,6 +3,18 @@
 All notable changes to this project are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/); versions follow [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- **Originals ledger** (`~/.config/agentsync/originals.json`; project scope:
+  `.agentsync/originals.json`): the pre-agentsync state of each managed path is
+  captured once, on first contact — a `.bak` when a real file was there, nothing when
+  it was absent or a symlink.
+
+### Fixed
+- A file agentsync had created itself was snapshotted as a `.bak` "original" the first
+  time its content changed, so `uninstall` restored stale rendered content.
+
 ## [0.3.0]
 
 ### Added

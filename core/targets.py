@@ -71,6 +71,7 @@ class Link(Target):
                 bak = self.path.with_name(self.path.name + ".bak")
                 if bak.exists():
                     bak.replace(self.path)
+                ctx.ledger.forget(self.path)
                 rep.removed(f"{self.label}: {self.path}")
             else:
                 rep.skipped(f"{self.label}: {self.path} not ours")
@@ -85,7 +86,7 @@ class Link(Target):
         if self.path.is_symlink():
             self.path.unlink()
         elif self.path.exists():
-            backup_once(self.path); self.path.unlink()
+            backup_once(self.path, ctx.ledger); self.path.unlink()
         os.symlink(want, self.path)
         rep.linked(f"{self.label}: {self.path} -> {want}")
 
@@ -105,6 +106,7 @@ class File(Target):
                 bak = self.path.with_name(self.path.name + ".bak")
                 if bak.exists():
                     bak.replace(self.path)
+                ctx.ledger.forget(self.path)
                 rep.removed(f"{self.label}: {self.path}")
             return
         if cur == new:
@@ -115,7 +117,7 @@ class File(Target):
                           self.path.name, cur or "", new)
             return
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        backup_once(self.path)
+        backup_once(self.path, ctx.ledger)
         if self.path.is_symlink():
             self.path.unlink()
         self.path.write_text(new)
@@ -211,7 +213,10 @@ class Merge(Target):
                           self.path.name, dump(cur), dump(target))
             return
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        backup_once(self.path)
+        if ctx.verb == "uninstall":
+            ctx.ledger.forget(self.path)  # what remains is the user's own file again
+        else:
+            backup_once(self.path, ctx.ledger)
         if self.path.is_symlink():
             self.path.unlink()
         self.path.write_text(dump(target))

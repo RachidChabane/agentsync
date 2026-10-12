@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Lifecycle checks (slice A): backup-on-merge, stale-hook cleanup + drift visibility,
+"""Lifecycle checks (slice A): backup-on-merge (originals captured on first contact
+only), stale-hook cleanup + drift visibility,
 `diff` writes nothing, `--json` output for CI, and uninstall surgically removes only what
 we added. Sandbox root; never touches $HOME. Run from repo root.
 """
@@ -54,6 +55,16 @@ def main():
         bak = cs.with_name("settings.json.bak")
         assert bak.exists() and json.loads(bak.read_text()) == {"theme": "dark"}, "no/bad backup"
 
+        # A4b: a file agentsync created is never later snapshotted as an "original".
+        mcp_art = root / ".claude/mcp-servers.json"
+        (conf / "mcp.json").write_text('{"servers":{"c7":{"transport":"http","url":"https://mcp.context7.com/mcp"}}}')
+        assert agentsync.main(["apply", *common]) == 0
+        assert "c7" in json.loads(mcp_art.read_text())
+        assert not mcp_art.with_name("mcp-servers.json.bak").exists(), "own rendering kept as original"
+        assert json.loads(bak.read_text()) == {"theme": "dark"}, "true original overwritten"
+        write_cfg(conf)
+        assert agentsync.main(["apply", *common]) == 0
+
         # A3: a stale agentsync hook (old repo path) is drift, and apply cleans it to one.
         data = json.loads(cs.read_text())
         data["hooks"]["PreToolUse"].append(
@@ -102,6 +113,8 @@ def main():
         assert not (root / ".config/opencode/plugin/determinism.js").exists(), "plugin link not removed"
         oc = json.loads((root / ".config/opencode/opencode.json").read_text())
         assert "mcp" not in oc and "skill" not in oc.get("permission", {}), "opencode keys not removed"
+        assert not (root / ".config/agentsync/originals.json").exists(), \
+            "a full uninstall leaves no capture ledger behind"
 
     resolve_config_checks()
     print("test_lifecycle: PASS")
