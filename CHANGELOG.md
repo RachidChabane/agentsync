@@ -18,6 +18,13 @@ All notable changes to this project are documented here. Format follows
   captured once, on first contact — a `.bak` when a real file was there, nothing when
   it was absent or a symlink.
 
+- **Release of what the config drops**: each adapter records what it put in place
+  (`~/.config/agentsync/managed.json`; project scope: `.agentsync/managed.json`). A
+  settings key, passthrough hook, gate hook, skill link or owned file that the config
+  no longer declares is removed on the next `apply` — only what the record says
+  agentsync wrote, never a foreign hook or a user's own link — and `verify` reports it
+  as drift until then. A path another enabled adapter still declares is kept.
+
 ### Changed
 - **Instruction files are always rendered, never symlinked.** Claude, Copilot, Windsurf,
   Zed and Cline each get an owned file; OpenCode's `instructions` ref points at a

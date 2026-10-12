@@ -4,6 +4,7 @@ per-run report, platform paths, and filesystem primitives. Stdlib only.
 """
 from __future__ import annotations
 
+import copy
 import json
 import os
 import platform
@@ -19,6 +20,7 @@ USER_STATE_DIR = Path(".config") / "agentsync"
 PROJECT_STATE_DIR = Path(".agentsync")
 LEDGER_FILE = "originals.json"
 LEDGER_KEY = "captured"
+RECORD_FILE = "managed.json"
 
 
 @dataclass
@@ -45,9 +47,16 @@ class Ctx:
         return self.verb in ("verify", "diff")
 
     @property
+    def state_dir(self) -> Path:
+        return self.root / (PROJECT_STATE_DIR if self.scope == "project" else USER_STATE_DIR)
+
+    @property
     def ledger(self) -> "OriginalsLedger":
-        state = PROJECT_STATE_DIR if self.scope == "project" else USER_STATE_DIR
-        return OriginalsLedger(self.root / state / LEDGER_FILE, self.root)
+        return OriginalsLedger(self.state_dir / LEDGER_FILE, self.root)
+
+    @property
+    def record(self) -> "ManagedRecord":
+        return ManagedRecord(self.state_dir / RECORD_FILE, self.root)
 
     @property
     def enforce_dir(self) -> Path:
@@ -122,6 +131,48 @@ class OriginalsLedger:
         keys = self._load()
         if self._key(path) in keys:
             self._save(keys - {self._key(path)})
+
+
+class ManagedRecord:
+    """What each adapter put in place on its last apply: per path, the target kind and
+    exactly what it managed there (a link's source, a merged file's owned key paths and
+    hooks). The next run releases whatever the config no longer asks for — and only
+    that, so content agentsync never wrote is never touched. Paths are relative to the
+    target root; layout: {adapter: {path: entry}}."""
+
+    def __init__(self, store: Path, root: Path):
+        self.store, self.root = store, root
+
+    def _load(self) -> dict:
+        return load_json(self.store) or {}
+
+    def _key(self, path: Path) -> str:
+        return os.path.relpath(path, self.root)
+
+    def entry(self, path: Path) -> dict | None:
+        """The entry any adapter recorded for `path` (a path has one owner shape)."""
+        key = self._key(path)
+        return next((paths[key] for paths in self._load().values() if key in paths), None)
+
+    def owned_by(self, adapter: str) -> dict:
+        """Absolute path -> entry, for everything `adapter` recorded."""
+        return {self.root / k: v for k, v in self._load().get(adapter, {}).items()}
+
+    def replace(self, adapter: str, entries: dict):
+        """Set `adapter`'s whole record (absolute path -> entry); empty forgets it."""
+        data = self._load()
+        before = copy.deepcopy(data)
+        if entries:
+            data[adapter] = {self._key(p): e for p, e in sorted(entries.items())}
+        else:
+            data.pop(adapter, None)
+        if data == before:
+            return
+        if data:
+            self.store.parent.mkdir(parents=True, exist_ok=True)
+            self.store.write_text(dump(data))
+        elif self.store.exists():
+            self.store.unlink()
 
 
 def backup_once(path: Path, ledger: OriginalsLedger):

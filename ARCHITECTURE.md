@@ -38,7 +38,11 @@ brings their own policy. Everything else below is downstream of this cut.
   Every helper is idempotent, so re-running is a no-op and `verify` right after `apply`
   is clean. Drift for shared files (e.g. `settings.json`) is defined as *"would our
   managed keys change?"* — computed by running the same idempotent mutation on a copy —
-  so a user's unrelated edits never read as drift.
+  so a user's unrelated edits never read as drift. Convergence also runs the other
+  way: each adapter records what it put in place (`managed.json`), and a later run
+  releases whatever the config stopped declaring — exactly the recorded keys, hooks,
+  links and files, never content agentsync did not write. Without that record a
+  removed hook or key would live on in the shared file forever.
 - **Dependency Inversion via a *thin* IR.** The canonical config is the abstraction both
   sides depend on. It's intentionally thin: only **MCP** and **enforcement wiring**
   genuinely diverge per harness and get adapter treatment. Instructions are plain

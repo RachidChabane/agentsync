@@ -130,6 +130,11 @@ Owned hooks are keyed by script name, so a stale entry left after the repo moves
 replaced (not duplicated) and shows up in `verify`. Want to change an owned value? Edit
 `config/`, not the tool's file.
 
+What the config stops declaring is released: each adapter records what it put in place
+(`~/.config/agentsync/managed.json`), and the next `apply` removes exactly that — a
+dropped settings key, passthrough hook or skill link — while hooks and links agentsync
+never wrote stay. `verify` reports a pending release as drift.
+
 Originals are captured once, on first contact with a path: a `.bak` when a real file
 was there, and an entry in `~/.config/agentsync/originals.json` either way, so a file
 agentsync wrote itself is never mistaken for yours. `uninstall` restores each `.bak`

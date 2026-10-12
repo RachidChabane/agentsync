@@ -23,6 +23,7 @@ verify:  ## syntax-check all sources + run the test suite (no writes to $HOME)
 	@python3 tests/test_golden.py
 	@python3 tests/test_project.py
 	@python3 tests/test_instructions.py
+	@python3 tests/test_prune.py
 	@python3 tests/test_lifecycle.py
 	@python3 tests/test_skills.py
 	@python3 tests/test_docs.py

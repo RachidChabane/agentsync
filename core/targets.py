@@ -50,6 +50,11 @@ class Target:
     def describe(self) -> str: return self.label
     def process(self, ctx: Ctx, rep: Report): raise NotImplementedError
 
+    def record_entry(self) -> dict | None:
+        """What this target puts in place, as the managed record keeps it (None: the
+        target keeps its own state, or has nothing to release later)."""
+        return None
+
     def _pending(self, ctx, rep, msg, name="", old="", new=""):
         rep.diff(msg)
         if ctx.verb == "diff" and (old or new):
@@ -61,6 +66,9 @@ class Target:
 class Link(Target):
     def __init__(self, path: Path, src: Path, label: str):
         self.path, self.src, self.label = path, src, label
+
+    def record_entry(self) -> dict:
+        return {"kind": "link", "src": str(self.src)}
 
     def process(self, ctx, rep):
         want = str(self.src)
@@ -96,6 +104,9 @@ class File(Target):
     project-scope instruction files)."""
     def __init__(self, path: Path, content: str, label: str):
         self.path, self.content, self.label = path, content, label
+
+    def record_entry(self) -> dict:
+        return {"kind": "file"}
 
     def process(self, ctx, rep):
         new = self.content
@@ -164,6 +175,34 @@ class HookSpec:
             hooks_block[self.event][:] = [e for e in hooks_block[self.event] if not self._mine(e)]
 
 
+def release(d: dict, entry: dict, keep_owned=(), keep_markers=(), keep_hooks=None):
+    """Remove from `d` what a recorded Merge entry put there, except what is still
+    wanted. Touches only recorded key paths, recorded marker hooks and recorded hook
+    groups — never anything agentsync did not write."""
+    keep_hooks = keep_hooks or {}
+    for path in entry.get("owned", []):
+        if tuple(path) not in keep_owned:
+            del_path(d, tuple(path))
+    hb = d.get("hooks")
+    if not isinstance(hb, dict):
+        return
+    touched = set()
+    for event, marker in entry.get("markers", []):
+        if (event, marker) not in keep_markers and event in hb:
+            HookSpec(event, "", marker).strip(hb)
+            touched.add(event)
+    for event, groups in entry.get("hooks", {}).items():
+        if event in hb:
+            gone = [g for g in groups if g not in keep_hooks.get(event, [])]
+            hb[event][:] = [e for e in hb[event] if e not in gone]
+            touched.add(event)
+    for event in touched:
+        if event in hb and not hb[event]:
+            del hb[event]
+    if not hb:
+        del d["hooks"]
+
+
 class Merge(Target):
     """A file shared with the user. We own specific key-paths (replaced wholesale) and
     specific hooks (kept exactly-once); everything else is preserved."""
@@ -171,8 +210,21 @@ class Merge(Target):
         self.path, self.owned, self.hooks, self.label = path, owned, hooks, label
         self.extra_hooks = extra_hooks or {}   # event -> [user hook groups], merged additively
 
-    def _desired(self, cur: dict) -> dict:
+    def record_entry(self) -> dict:
+        return {"kind": "merge", "owned": [list(p) for p, _ in self.owned],
+                "markers": [[s.event, s.marker] for s in self.hooks],
+                "hooks": self.extra_hooks}
+
+    def _release_stale(self, d: dict, prev: dict | None):
+        """Drop what the previous apply owned here that the config no longer asks for."""
+        if prev:
+            release(d, prev, keep_owned={p for p, _ in self.owned},
+                    keep_markers={(s.event, s.marker) for s in self.hooks},
+                    keep_hooks=self.extra_hooks)
+
+    def _desired(self, cur: dict, prev: dict | None = None) -> dict:
         d = copy.deepcopy(cur)
+        self._release_stale(d, prev)
         for path, value in self.owned:
             set_path(d, path, value)
         if self.hooks or self.extra_hooks:
@@ -186,8 +238,9 @@ class Merge(Target):
                         arr.append(g)
         return d
 
-    def _without(self, cur: dict) -> dict:
+    def _without(self, cur: dict, prev: dict | None = None) -> dict:
         d = copy.deepcopy(cur)
+        self._release_stale(d, prev)
         for path, _ in self.owned:
             del_path(d, path)
         hb = d.get("hooks", {})
@@ -204,7 +257,8 @@ class Merge(Target):
 
     def process(self, ctx, rep):
         cur = load_json(self.path) or {}
-        target = self._without(cur) if ctx.verb == "uninstall" else self._desired(cur)
+        prev = ctx.record.entry(self.path)
+        target = self._without(cur, prev) if ctx.verb == "uninstall" else self._desired(cur, prev)
         if target == cur:
             (rep.skipped if ctx.verb == "uninstall" else rep.ok)(f"{self.label}: {self.path}")
             return
@@ -221,6 +275,70 @@ class Merge(Target):
             self.path.unlink()
         self.path.write_text(dump(target))
         (rep.removed if ctx.verb == "uninstall" else rep.wrote)(f"{self.label}: {self.path}")
+
+
+class Stale(Target):
+    """A path an adapter managed on its last apply that the config no longer asks for.
+    Apply and uninstall release exactly what the record says agentsync put there — a
+    link still pointing at its recorded source, an owned file, the recorded keys and
+    hooks of a shared file; verify and diff report it as drift."""
+
+    def __init__(self, path: Path, entry: dict):
+        self.path, self.entry = path, entry
+        self.label = f"stale-{entry.get('kind', '?')}"
+
+    def process(self, ctx, rep):
+        kind = self.entry.get("kind")
+        if kind == "link":
+            self._link(ctx, rep)
+        elif kind == "file":
+            self._file(ctx, rep)
+        elif kind == "merge":
+            self._merge(ctx, rep)
+
+    def _link(self, ctx, rep):
+        ours = self.path.is_symlink() and os.readlink(self.path) == self.entry["src"]
+        if not ours:
+            rep.ok(f"{self.label}: {self.path} already released")
+            return
+        if ctx.check:
+            self._pending(ctx, rep, f"{self.label}: {self.path} is no longer configured")
+            return
+        self.path.unlink()
+        self._restore(ctx)
+        rep.removed(f"{self.label}: {self.path}")
+
+    def _file(self, ctx, rep):
+        if not self.path.exists() or self.path.is_symlink():
+            rep.ok(f"{self.label}: {self.path} already released")
+            return
+        if ctx.check:
+            self._pending(ctx, rep, f"{self.label}: {self.path} is no longer configured",
+                          self.path.name, self.path.read_text(), "")
+            return
+        self.path.unlink()
+        self._restore(ctx)
+        rep.removed(f"{self.label}: {self.path}")
+
+    def _merge(self, ctx, rep):
+        cur = load_json(self.path) or {}
+        target = copy.deepcopy(cur)
+        release(target, self.entry)
+        if target == cur:
+            rep.ok(f"{self.label}: {self.path} already released")
+            return
+        if ctx.check:
+            self._pending(ctx, rep, f"{self.label}: {self.path} holds keys no longer configured",
+                          self.path.name, dump(cur), dump(target))
+            return
+        self.path.write_text(dump(target))
+        rep.removed(f"{self.label}: {self.path} released keys no longer configured")
+
+    def _restore(self, ctx):
+        bak = self.path.with_name(self.path.name + ".bak")
+        if bak.exists():
+            bak.replace(self.path)
+        ctx.ledger.forget(self.path)
 
 
 class ClaudeMcp(Target):

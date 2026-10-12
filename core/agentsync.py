@@ -24,7 +24,7 @@ from core import gen_docs
 from core import instructions as instructionsmod
 from core import skills as skillmod
 from core.adapters import ADAPTERS
-from core.targets import ClaudeMcp, Link
+from core.targets import ClaudeMcp, Link, Stale
 from core.util import Ctx, Report
 
 REPO = Path(__file__).resolve().parents[1]
@@ -130,16 +130,39 @@ def doctor(ctx: Ctx, wanted: list) -> int:
     return 0 if ok else 1
 
 
-def run_adapter(adapter, ctx: Ctx, no_mcp_import: bool) -> Report:
+def declared_targets(adapter, ctx: Ctx) -> list:
+    return adapter.project_targets(ctx) if ctx.scope == "project" else adapter.targets(ctx)
+
+
+def recordable_paths(tgts: list) -> set:
+    return {t.path for t in tgts if t.record_entry() is not None}
+
+
+def stale_targets(adapter, ctx: Ctx, tgts: list, claimed: frozenset) -> list:
+    """What this adapter recorded on its last apply and no longer declares. A path
+    another running adapter still declares (a shared AGENTS.md) is left to it."""
+    keep = recordable_paths(tgts) | claimed
+    return [Stale(path, entry) for path, entry in ctx.record.owned_by(adapter.name).items()
+            if path not in keep]
+
+
+def run_adapter(adapter, ctx: Ctx, no_mcp_import: bool, claimed: frozenset = frozenset()) -> Report:
+    """`claimed`: paths the other adapters of this run declare, never released here."""
     rep = Report(adapter.name)
-    tgts = adapter.project_targets(ctx) if ctx.scope == "project" else adapter.targets(ctx)
-    if ctx.scope == "project" and not tgts:
+    tgts = declared_targets(adapter, ctx)
+    stale = stale_targets(adapter, ctx, tgts, claimed)
+    if ctx.scope == "project" and not tgts and not stale:
         rep.skipped("no project-scope surface")
         return rep
-    for t in tgts:
+    for t in tgts + stale:
         if no_mcp_import and isinstance(t, ClaudeMcp):
             continue
         t.process(ctx, rep)
+    if ctx.verb == "apply":
+        ctx.record.replace(adapter.name, {t.path: e for t in tgts
+                                          if (e := t.record_entry()) is not None})
+    elif ctx.verb == "uninstall":
+        ctx.record.replace(adapter.name, {})
     return rep
 
 
@@ -210,7 +233,10 @@ def main(argv=None) -> int:
 
     if not args.json:
         print(f"{args.command}: config={config_dir.name} root={root} harnesses={','.join(wanted)}\n")
-    reports = [run_adapter(ADAPTERS[h], ctx, args.no_mcp_import) for h in wanted]
+    declared = {h: recordable_paths(declared_targets(ADAPTERS[h], ctx)) for h in wanted}
+    reports = [run_adapter(ADAPTERS[h], ctx, args.no_mcp_import,
+                           frozenset().union(*(p for o, p in declared.items() if o != h)))
+               for h in wanted]
     drift = any(rep.drift for rep in reports)
     doc_drift = False
     if args.command == "verify" and ctx.scope == "user":  # inventory docs are user-scope
