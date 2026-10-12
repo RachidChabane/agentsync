@@ -22,10 +22,11 @@ from pathlib import Path
 from core import __version__
 from core import gen_docs
 from core import instructions as instructionsmod
+from core import layers as layersmod
 from core import skills as skillmod
 from core.adapters import ADAPTERS
 from core.targets import ClaudeMcp, Link, Stale
-from core.util import Ctx, Report
+from core.util import ConfigError, Ctx, Report
 
 REPO = Path(__file__).resolve().parents[1]
 ICON = {"ok": "·", "write": "✎", "link": "→", "skip": "–", "remove": "✗", "drift": "Δ"}
@@ -47,16 +48,14 @@ def resolve_config(arg: str | None, repo: Path) -> Path:
 
 
 def load_config(config_dir: Path):
+    """(profile, skills, servers, overrides): the base sources with every layer that
+    instructions.md includes merged in. profile.json is machine-local, never layered."""
     def jload(name):
-        p = config_dir / name
-        if not p.exists():
-            return {}
-        try:
-            return json.loads(p.read_text())
-        except json.JSONDecodeError as e:
-            sys.exit(f"error: {p} is not valid JSON ({e})")
-    return (jload("profile.json"), jload("skills.json").get("skills", {}),
-            jload("mcp.json").get("servers", {}), jload("overrides.json"))
+        return layersmod.load_json_source(config_dir / name)
+    servers, skills, overrides = layersmod.apply_layers(
+        config_dir, jload(layersmod.MCP_FILE).get(layersmod.SERVERS_KEY, {}),
+        jload(layersmod.SKILLS_FILE).get(layersmod.SKILLS_KEY, {}), jload(layersmod.OVERRIDES_FILE))
+    return jload("profile.json"), skills, servers, overrides
 
 
 def _installed(name: str, root: Path) -> bool:
@@ -200,10 +199,10 @@ def main(argv=None) -> int:
                      "profile.json) to make this repo agentsync-managed")
     else:
         config_dir = resolve_config(args.config, REPO)
-    profile, skills_cfg, servers, overrides = load_config(config_dir)
-    try:  # every @include must expand before any harness file is touched
+    try:  # every @include and layer must resolve before any harness file is touched
         instructionsmod.check(config_dir)
-    except instructionsmod.IncludeError as e:
+        profile, skills_cfg, servers, overrides = load_config(config_dir)
+    except ConfigError as e:
         sys.exit(f"error: {e}")
 
     root = proj if proj else \

@@ -16,6 +16,10 @@ Rules, all enforced here so every adapter renders the same text:
   otherwise as *nested*.
 - The rendered text replaces the directive line with the included file's content
   (newline-terminated); nothing of the directive survives.
+- A directory target is a **layer**: a directory shaped like the config dir. Its own
+  `instructions.md` (optional) is spliced at the line; its JSON sources merge into the
+  config (core/layers.py). Because that JSON applies to every harness, a layer can only
+  be included from the shared `instructions.md`, never from a variant.
 
 Pure text-and-path logic: no harness knowledge, no writes. Stdlib only.
 """
@@ -25,6 +29,8 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from .util import ConfigError
+
 DIRECTIVE_KEYWORD = "@include"
 INSTRUCTIONS_FILE = "instructions.md"
 VARIANT_GLOB = "instructions.*.md"
@@ -33,7 +39,7 @@ _DIRECTIVE = re.compile(rf"^{re.escape(DIRECTIVE_KEYWORD)}[ \t]+(?P<target>\S(?:
 _FENCE = re.compile(r"^ {0,3}(?P<marker>`{3,}|~{3,})")
 
 
-class IncludeError(ValueError):
+class IncludeError(ConfigError):
     """An `@include` directive that cannot be expanded; the message names file:line."""
 
 
@@ -77,6 +83,19 @@ def expand(source: Path, config_dir: Path) -> str:
     return "".join(lines)
 
 
+def layers(config_dir: Path) -> list[Path]:
+    """The layer directories the shared instructions.md includes, in directive order."""
+    source = config_dir / INSTRUCTIONS_FILE
+    if not source.is_file():
+        return []
+    found = []
+    for d in directives(source.read_text()):
+        target = _resolve(source, d.target)
+        if target.is_dir() and target not in found:
+            found.append(target)
+    return found
+
+
 def check(config_dir: Path) -> None:
     """Expand every instructions source in `config_dir`; raise IncludeError on the
     first directive that cannot be expanded. Lets the CLI fail before any write."""
@@ -95,10 +114,27 @@ def _included_text(source: Path, d: Directive, config_dir: Path) -> str:
                            f"the config directory {root}")
     if target == source.resolve():
         raise IncludeError(f"{where}: cyclic {DIRECTIVE_KEYWORD}: {source.name} includes itself")
+    if target.is_dir():
+        return _layer_text(source, target, where, config_dir)
     if not target.is_file():
         raise IncludeError(f"{where}: {DIRECTIVE_KEYWORD} target not found: {target}")
     body = target.read_text()
     _refuse_nested(source, target, body)
+    return body if body.endswith("\n") or not body else body + "\n"
+
+
+def _layer_text(source: Path, layer: Path, where: str, config_dir: Path) -> str:
+    if source.resolve() != (config_dir / INSTRUCTIONS_FILE).resolve():
+        raise IncludeError(f"{where}: layer {layer} can only be included from the shared "
+                           f"{INSTRUCTIONS_FILE}: its config applies to every harness")
+    if layer == config_dir.resolve():
+        raise IncludeError(f"{where}: cyclic {DIRECTIVE_KEYWORD}: the config directory "
+                           f"cannot be its own layer")
+    text_file = layer / INSTRUCTIONS_FILE
+    if not text_file.is_file():
+        return ""
+    body = text_file.read_text()
+    _refuse_nested(source, text_file.resolve(), body)
     return body if body.endswith("\n") or not body else body + "\n"
 
 

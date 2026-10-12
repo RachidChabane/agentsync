@@ -67,6 +67,14 @@ level deep by design: an included file holds rules, not structure, which keeps c
 impossible and every error a single `file:line`. The CLI expands every source before
 any verb runs, so a bad directive fails before a single write.
 
+A directory target is a **layer** — a directory shaped like `config/` — so the same
+one-line switch carries a context's MCP servers, skills and settings along with its
+text. `core/layers.py` merges a layer into the base config before any adapter runs
+(named entries unique, overrides merged recursively, conflicts fatal), so adapters
+never know a layer existed; removing the line is just a config change the reconciler
+releases like any other. Layers attach to the shared `instructions.md` only, because
+their JSON applies to every harness.
+
 Rendering is unconditional. A symlink would hand a harness the raw directive, and
 switching a path between "symlink" and "rendered file" as the config changes would make
 the reconciler snapshot its own earlier rendering as the user's original. Every owned

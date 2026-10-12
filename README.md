@@ -220,8 +220,16 @@ next `agentsync apply`, and `verify` reports a stale copy as drift.
   block, indented, or mid-sentence is not a directive. An included file cannot include
   another; a nested, cyclic or missing target aborts every verb with `file:line`
   before anything is written.
+- **Layers** — when the target is a directory, it is a *layer*: a directory shaped
+  like `config/` (`instructions.md`, `mcp.json`, `skills.json`, `overrides.json`, each
+  optional). `@include layers/work/` splices the layer's text at that line and merges
+  its JSON into the config, so one line brings in — and, once deleted, takes out —
+  a whole context: rules, MCP servers, skills, settings and hooks. Server and skill
+  names must be unique across the base and its layers; overrides merge recursively
+  (objects merge, lists concatenate, scalars must agree), and any conflict aborts with
+  the layer file and key path. A layer can only be included from `instructions.md`.
 - **Per-harness variants** — `config/instructions.<harness>.md` is appended to the
-  shared instructions for that harness only (it may use `@include` too).
+  shared instructions for that harness only (it may use `@include` too, for files).
 
 ### 2. The determinism protocol (the reference feature)
 

@@ -23,6 +23,10 @@ LEDGER_KEY = "captured"
 RECORD_FILE = "managed.json"
 
 
+class ConfigError(ValueError):
+    """A config that cannot be rendered as written; the message names where and why."""
+
+
 @dataclass
 class Ctx:
     repo: Path          # this checkout (source of enforcement scripts)

@@ -13,6 +13,13 @@ All notable changes to this project are documented here. Format follows
   fenced code are plain text; a missing target, a nested directive, or a cyclic one
   aborts every verb with `file:line` before anything is written. Deleting the one
   directive line and re-applying removes the included block from every harness.
+- **Config layers**: an `@include` whose target is a directory pulls in a whole layer
+  shaped like the config dir — its `instructions.md` spliced at the line, its
+  `mcp.json` / `skills.json` / `overrides.json` merged into the config
+  (`core/layers.py`). Named servers and skills must be unique; overrides merge
+  recursively (lists concatenate, scalars must agree); a conflict names the layer file
+  and key path and aborts before any write. Deleting the one line and re-applying
+  removes the layer's text, settings, hooks, MCP servers and skill links everywhere.
 - **Originals ledger** (`~/.config/agentsync/originals.json`; project scope:
   `.agentsync/originals.json`): the pre-agentsync state of each managed path is
   captured once, on first contact — a `.bak` when a real file was there, nothing when
