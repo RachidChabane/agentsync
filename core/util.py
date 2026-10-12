@@ -78,6 +78,7 @@ class Report:
     name: str
     lines: list = field(default_factory=list)   # (status, message)
     drift: bool = False
+    failed: bool = False
     diffs: list = field(default_factory=list)   # human-readable diff blocks
 
     def ok(self, m):     self.lines.append(("ok", m))
@@ -86,6 +87,7 @@ class Report:
     def skipped(self, m): self.lines.append(("skip", m))
     def removed(self, m): self.lines.append(("remove", m))
     def diff(self, m):   self.drift = True; self.lines.append(("drift", m))
+    def fail(self, m):   self.failed = True; self.lines.append(("fail", m))
 
 
 def vscode_user_dir(root: Path) -> Path:

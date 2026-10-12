@@ -228,6 +228,18 @@ next `agentsync apply`, and `verify` reports a stale copy as drift.
   names must be unique across the base and its layers; overrides merge recursively
   (objects merge, lists concatenate, scalars must agree), and any conflict aborts with
   the layer file and key path. A layer can only be included from `instructions.md`.
+- **Services** — a `services.json` (in `config/` or in a layer) declares background
+  jobs the config keeps installed, each as two commands:
+  `{"services": {"sync-agent": {"install": ["script/sync-agent", "install"],
+  "uninstall": ["script/sync-agent", "uninstall"]}}}`. A first word holding a slash is
+  resolved against the declaring directory, so a layer ships its own scripts. `apply`
+  runs `install` once, and again only when the commands change (the old `uninstall`
+  runs first); a service the config stops declaring — a deleted `@include` line
+  included — has its recorded `uninstall` run on the next `apply`, and `agentsync
+  uninstall` runs them all. A failing command keeps the record, exits non-zero and is
+  retried. `verify` and `diff` execute nothing and report the difference as drift.
+  Commands run only against the real `$HOME`; a `--root` sandbox and project scope
+  (which refuses `services.json`) never run or record one.
 - **Per-harness variants** — `config/instructions.<harness>.md` is appended to the
   shared instructions for that harness only (it may use `@include` too, for files).
 

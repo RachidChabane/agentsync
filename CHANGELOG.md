@@ -20,6 +20,14 @@ All notable changes to this project are documented here. Format follows
   recursively (lists concatenate, scalars must agree); a conflict names the layer file
   and key path and aborts before any write. Deleting the one line and re-applying
   removes the layer's text, settings, hooks, MCP servers and skill links everywhere.
+- **Services** (`core/services.py`): a `services.json` in the config dir or a layer
+  declares a background job as an `install` and an `uninstall` command. `apply` installs
+  it once and again only when the commands change, runs the recorded `uninstall` when
+  the declaration disappears (a deleted layer `@include` line included), and keeps the
+  record of a failing command so the next run retries; `agentsync uninstall` releases
+  every recorded service. `verify` and `diff` execute nothing and report drift. Commands
+  run only against the real `$HOME`; sandbox roots and project scope never run or
+  record one.
 - **Originals ledger** (`~/.config/agentsync/originals.json`; project scope:
   `.agentsync/originals.json`): the pre-agentsync state of each managed path is
   captured once, on first contact — a `.bak` when a real file was there, nothing when

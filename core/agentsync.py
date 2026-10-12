@@ -23,13 +23,15 @@ from core import __version__
 from core import gen_docs
 from core import instructions as instructionsmod
 from core import layers as layersmod
+from core import services as servicesmod
 from core import skills as skillmod
 from core.adapters import ADAPTERS
 from core.targets import ClaudeMcp, Link, Stale
 from core.util import ConfigError, Ctx, Report
 
 REPO = Path(__file__).resolve().parents[1]
-ICON = {"ok": "·", "write": "✎", "link": "→", "skip": "–", "remove": "✗", "drift": "Δ"}
+ICON = {"ok": "·", "write": "✎", "link": "→", "skip": "–", "remove": "✗", "drift": "Δ",
+        "fail": "!"}
 
 
 def resolve_config(arg: str | None, repo: Path) -> Path:
@@ -202,6 +204,9 @@ def main(argv=None) -> int:
     try:  # every @include and layer must resolve before any harness file is touched
         instructionsmod.check(config_dir)
         profile, skills_cfg, servers, overrides = load_config(config_dir)
+        services = servicesmod.declared(config_dir)
+        if proj:
+            servicesmod.refuse_in_project(services)
     except ConfigError as e:
         sys.exit(f"error: {e}")
 
@@ -236,6 +241,9 @@ def main(argv=None) -> int:
     reports = [run_adapter(ADAPTERS[h], ctx, args.no_mcp_import,
                            frozenset().union(*(p for o, p in declared.items() if o != h)))
                for h in wanted]
+    service_report = servicesmod.reconcile(ctx, services)
+    if service_report.lines:
+        reports.append(service_report)
     drift = any(rep.drift for rep in reports)
     doc_drift = False
     if args.command == "verify" and ctx.scope == "user":  # inventory docs are user-scope
@@ -278,6 +286,9 @@ def main(argv=None) -> int:
     if args.command == "diff":
         print("changes pending — run `apply`." if drift else "nothing to change.")
         return 0
+    if any(rep.failed for rep in reports):
+        print("FAILED — a service command did not succeed; the next run retries it.")
+        return 1
     print("done." if args.command == "apply" else "uninstalled (originals restored from .bak where present).")
     return 0
 

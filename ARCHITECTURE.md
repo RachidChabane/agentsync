@@ -75,6 +75,15 @@ never know a layer existed; removing the line is just a config change the reconc
 releases like any other. Layers attach to the shared `instructions.md` only, because
 their JSON applies to every harness.
 
+A layer or the config can also declare **services** — background jobs, each defined by
+an `install` and an `uninstall` command (`core/services.py`). The engine does not render
+the job (a LaunchAgent, a cron entry): its own script already owns that, and a second
+author of the same file would be a second source of truth. The engine decides only
+*when* each command runs, from the same managed record as everything else: install once,
+reinstall on a changed declaration, run the recorded `uninstall` when the declaration
+disappears. Services run commands, so they are inert in `verify`/`diff`, in a sandbox
+root, and in project scope, where a shared repo must not decide what runs on a machine.
+
 Rendering is unconditional. A symlink would hand a harness the raw directive, and
 switching a path between "symlink" and "rendered file" as the config changes would make
 the reconciler snapshot its own earlier rendering as the user's original. Every owned
