@@ -8,6 +8,7 @@ degrade gracefully when a harness lacks a surface (e.g. VS Code has no MCP/skill
 """
 from __future__ import annotations
 
+from ..instructions import expand
 from ..util import Ctx
 
 
@@ -32,18 +33,22 @@ class Adapter:
         p = ctx.config / f"instructions.{self.name}.md"
         return p if p.exists() else None
 
+    def _shared_text(self, ctx: Ctx) -> str:
+        """The shared instructions with every `@include` expanded (no variant)."""
+        return expand(ctx.instructions, ctx.config)
+
     def _instructions_text(self, ctx: Ctx) -> str:
         var = self._variant(ctx)
-        base = ctx.instructions.read_text()
-        return base.rstrip() + "\n\n" + var.read_text() if var else base
+        base = self._shared_text(ctx)
+        return base.rstrip() + "\n\n" + expand(var, ctx.config) if var else base
 
     def _instructions(self, ctx: Ctx, dest):
-        """Symlink the shared instructions — or, when a variant exists, own a rendered
-        base+variant file (a symlink can't express the concatenation)."""
-        from ..targets import File, Link
-        if self._variant(ctx):
-            return File(dest, self._instructions_text(ctx), "instructions")
-        return Link(dest, ctx.instructions, "instructions")
+        """Own a rendered instructions file: the shared text with every `@include`
+        expanded, plus this harness's variant. Always a file, never a symlink — a
+        symlink would expose raw directives, and flipping between the two would leave
+        a rendered copy behind as a false `.bak` original."""
+        from ..targets import File
+        return File(dest, self._instructions_text(ctx), "instructions")
 
     def _passthrough(self, ctx: Ctx):
         """User's arbitrary settings for this harness (config/overrides.json): scalar/
@@ -91,7 +96,7 @@ class FileHarness(Adapter):
         # base text only — several adapters may own this one file, so no per-harness
         # variants here (they'd fight over the content).
         from ..targets import File
-        return [File(ctx.root / "AGENTS.md", ctx.instructions.read_text(), "instructions")]
+        return [File(ctx.root / "AGENTS.md", self._shared_text(ctx), "instructions")]
 
 
 from .claude import Claude          # noqa: E402

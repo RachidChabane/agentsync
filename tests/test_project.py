@@ -50,15 +50,15 @@ def user_scope_new_harnesses():
         ws = json.loads((root / ".codeium/windsurf/mcp_config.json").read_text())
         assert ws["mcpServers"]["context7"] == {"serverUrl": "https://mcp.context7.com/mcp"}, \
             "windsurf remote entries use serverUrl"
-        assert (root / ".codeium/windsurf/memories/global_rules.md").is_symlink()
+        assert (root / ".codeium/windsurf/memories/global_rules.md").read_text() == "# Team rules\nbe deterministic\n"
 
-        assert (root / ".config/zed/AGENTS.md").is_symlink()
+        assert (root / ".config/zed/AGENTS.md").read_text() == "# Team rules\nbe deterministic\n"
         assert not (root / ".config/zed/settings.json").exists(), "zed manages no MCP (JSONC)"
 
         cl = json.loads((root / ".cline/mcp.json").read_text())
         assert cl["mcpServers"]["context7"]["type"] == "streamableHttp"
         assert cl["mcpServers"]["db"] == {"command": "npx", "args": ["-y", "db-mcp"]}
-        assert (root / "Documents/Cline/Rules/agentsync.md").is_symlink()
+        assert (root / "Documents/Cline/Rules/agentsync.md").read_text() == "# Team rules\nbe deterministic\n"
 
         assert agentsync.main(["verify", *common]) == 0, "verify dirty after apply"
         assert agentsync.main(["uninstall", *common]) == 0
@@ -90,7 +90,8 @@ def project_scope():
         assert (proj / "AGENTS.md").read_text().startswith("# Team rules")
 
         oc = json.loads((proj / "opencode.json").read_text())
-        assert oc["instructions"] == [".agentsync/instructions.md"], "must be repo-relative"
+        assert oc["instructions"] == [".opencode/agentsync-instructions.md"], "must be repo-relative"
+        assert (proj / ".opencode/agentsync-instructions.md").read_text().startswith("# Team rules")
         vs = json.loads((proj / ".vscode/mcp.json").read_text())
         assert vs["inputs"] == [{"id": "tok"}], "clobbered user's inputs key"
         assert vs["servers"]["secret"]["headers"] == {"x-key": "${env:X_KEY}"}

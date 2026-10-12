@@ -42,13 +42,35 @@ brings their own policy. Everything else below is downstream of this cut.
 - **Dependency Inversion via a *thin* IR.** The canonical config is the abstraction both
   sides depend on. It's intentionally thin: only **MCP** and **enforcement wiring**
   genuinely diverge per harness and get adapter treatment. Instructions are plain
-  markdown (symlink/inline) and skills are the open Agent Skills standard (linking +
-  tiers) — wrapping those in a schema would be abstraction for its own sake.
+  markdown (one `@include` expansion, then a rendered file or an inline block) and
+  skills are the open Agent Skills standard (linking + tiers) — wrapping those in a
+  schema would be abstraction for its own sake.
 - **Capability detection over version-sniffing.** `capabilities()` lets the reconciler
   degrade gracefully (VS Code: no MCP/skill surface) instead of failing. This is the
   honest path to "harness-agnostic."
 - **Convention over Configuration.** Standard verb names; `init` infers the rest.
 - **Facade.** `make` (or `python3 -m core.agentsync`) is the single front door.
+
+## Instructions are composed, then always rendered
+
+`config/instructions.md` can pull a self-contained block of rules in with one
+`@include <path>` line, so a block that belongs to one context (an employer, a client,
+a machine) lives in its own file and leaves every harness when that line goes.
+`core/instructions.py` owns the whole syntax — pure text and paths, no harness
+knowledge — and every adapter reads the expanded text through
+`Adapter._instructions_text`, so no harness can see a raw directive. Expansion is one
+level deep by design: an included file holds rules, not structure, which keeps cycles
+impossible and every error a single `file:line`. The CLI expands every source before
+any verb runs, so a bad directive fails before a single write.
+
+Rendering is unconditional. A symlink would hand a harness the raw directive, and
+switching a path between "symlink" and "rendered file" as the config changes would make
+the reconciler snapshot its own earlier rendering as the user's original. Every owned
+file agentsync creates carries the same trap — without a record, its first rewrite would
+back up agentsync's own output. The **originals ledger** closes it for every target:
+the pre-agentsync state of a path is captured once, on first contact, and recorded
+whether or not there was anything to keep; `uninstall` restores the `.bak` and forgets
+the path.
 
 ## The determinism protocol as the reference plugin
 
@@ -96,7 +118,7 @@ machinery, because the problem shape differs:
 
 - Config-sync *reconciles live files it shares with the user* — Merge/`.bak`/surgical
   uninstall earn their keep — and never transforms content (a skill is a symlink, MCP a
-  fixed render). Packaging is *lossy content transformation* into an output tree the
+  fixed render, instructions a lossless include expansion). Packaging is *lossy content transformation* into an output tree the
   packager owns wholesale: uninstall is deleting `dist/`, drift is `pack --check` (or
   `git diff --exit-code` where `dist/` is committed).
 - **Shared:** the low-level plumbing (`util.dump`/`load_json`, `targets.udiff`),

@@ -6,10 +6,26 @@ All notable changes to this project are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- **`@include` in instructions** (`core/instructions.py`): a line holding exactly
+  `@include <path>` in `instructions.md` or an `instructions.<harness>.md` variant is
+  replaced by that file's text in every harness, user and project scope. Paths are
+  relative to the including file and must stay inside the config dir; directives in
+  fenced code are plain text; a missing target, a nested directive, or a cyclic one
+  aborts every verb with `file:line` before anything is written. Deleting the one
+  directive line and re-applying removes the included block from every harness.
 - **Originals ledger** (`~/.config/agentsync/originals.json`; project scope:
   `.agentsync/originals.json`): the pre-agentsync state of each managed path is
   captured once, on first contact — a `.bak` when a real file was there, nothing when
   it was absent or a symlink.
+
+### Changed
+- **Instruction files are always rendered, never symlinked.** Claude, Copilot, Windsurf,
+  Zed and Cline each get an owned file; OpenCode's `instructions` ref points at a
+  rendered `~/.config/agentsync/opencode-instructions.md` (project scope:
+  `.opencode/agentsync-instructions.md`) instead of the source. An edit to
+  `config/instructions.md` now reaches the harnesses on the next `apply`, and
+  `verify` reports a stale copy as drift. An existing symlink is replaced in place,
+  without a `.bak`.
 
 ### Fixed
 - A file agentsync had created itself was snapshotted as a `.bak` "original" the first

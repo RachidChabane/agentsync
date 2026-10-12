@@ -36,7 +36,7 @@ class {Cls}(Adapter):
         base = ctx.root / "TODO"  # the harness's config dir under $HOME
         extra_owned, extra_hooks = self._passthrough(ctx)
         return [
-            # Link(base / "INSTRUCTIONS_FILE", ctx.instructions, "instructions"),
+            # self._instructions(ctx, base / "INSTRUCTIONS_FILE"),  # rendered, @include expanded
             # Json(base / "MCP_FILE", {{n: ... for n, s in ctx.servers.items()}}, "mcp"),
             # Merge(base / "settings.json",
             #       owned=[(("SOME_KEY",), VALUE)] + extra_owned,

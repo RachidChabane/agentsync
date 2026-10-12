@@ -21,6 +21,7 @@ from pathlib import Path
 
 from core import __version__
 from core import gen_docs
+from core import instructions as instructionsmod
 from core import skills as skillmod
 from core.adapters import ADAPTERS
 from core.targets import ClaudeMcp, Link
@@ -177,6 +178,10 @@ def main(argv=None) -> int:
     else:
         config_dir = resolve_config(args.config, REPO)
     profile, skills_cfg, servers, overrides = load_config(config_dir)
+    try:  # every @include must expand before any harness file is touched
+        instructionsmod.check(config_dir)
+    except instructionsmod.IncludeError as e:
+        sys.exit(f"error: {e}")
 
     root = proj if proj else \
         Path(args.root).expanduser() if args.root else \

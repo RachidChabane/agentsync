@@ -125,14 +125,14 @@ def enforcement_off():
         assert not (root / ".config/opencode/plugin/determinism.js").exists(), \
             "opencode plugin installed despite enforcement=false"
         # sync itself still works
-        assert (root / ".claude/CLAUDE.md").is_symlink()
+        assert (root / ".claude/CLAUDE.md").read_text().startswith("# Global")
         assert (root / ".claude/mcp-servers.json").exists()
         assert agentsync.main(["verify", *common]) == 0, "verify dirty after apply"
 
 
 def instruction_variants():
-    """config/instructions.<harness>.md is appended for that harness only: a rendered
-    file where the harness reads one path, an extra list entry for OpenCode."""
+    """config/instructions.<harness>.md is appended for that harness only, in the
+    rendered file that harness reads (OpenCode's rendered file included)."""
     with tempfile.TemporaryDirectory() as tmp:
         root, cfg = Path(tmp) / "home", Path(tmp) / "cfg"
         write_config(cfg)
@@ -143,15 +143,18 @@ def instruction_variants():
         cm = root / ".claude/CLAUDE.md"
         assert not cm.is_symlink() and cm.read_text().startswith("# Global"), "variant not rendered"
         assert "## Claude-only" in cm.read_text(), "variant not appended"
-        assert (root / ".copilot/copilot-instructions.md").is_symlink(), \
-            "harness without a variant must keep the symlink"
+        assert (root / ".copilot/copilot-instructions.md").read_text() == "# Global\nbe deterministic\n", \
+            "harness without a variant gets the shared text only"
         assert agentsync.main(["verify", *common]) == 0, "verify dirty after apply"
 
         (cfg / "instructions.opencode.md").write_text("## OC-only\n")
         assert agentsync.main(["verify", *common]) == 1, "new variant not seen as drift"
         assert agentsync.main(["apply", *common]) == 0
         oc = json.loads((root / ".config/opencode/opencode.json").read_text())
-        assert str(cfg / "instructions.opencode.md") in oc["instructions"], oc["instructions"]
+        rendered = Path(oc["instructions"][0])
+        assert oc["instructions"] == [str(root / ".config/agentsync/opencode-instructions.md")]
+        assert rendered.read_text().endswith("## OC-only\n"), "variant not appended for OpenCode"
+        assert "## Claude-only" not in rendered.read_text(), "another harness's variant leaked"
 
 
 if __name__ == "__main__":

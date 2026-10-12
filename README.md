@@ -82,8 +82,9 @@ gating — a copy-paste GitHub Action lives in [`docs/ci.md`](docs/ci.md).
 
 `agentsync apply --project [DIR]` reads config from the repo's own `.agentsync/`
 (instructions.md, mcp.json, profile.json) and renders **committed** files teammates
-share: `CLAUDE.md` + `.mcp.json`, `.github/copilot-instructions.md`, `opencode.json`,
-`.vscode/mcp.json`, `AGENTS.md`, `.cursor/mcp.json`. Secrets stay out — remote-server
+share: `CLAUDE.md` + `.mcp.json`, `.github/copilot-instructions.md`, `opencode.json` +
+`.opencode/agentsync-instructions.md`, `.vscode/mcp.json`, `AGENTS.md`,
+`.cursor/mcp.json`, plus the capture ledger `.agentsync/originals.json`. Secrets stay out — remote-server
 auth renders as `${ENV_VAR}` headers, never this machine's values. `verify --project
 --json` in CI fails the PR when someone hand-edits a rendered file (see `docs/ci.md`).
 User-scope concerns (skills, hooks, inventory docs) deliberately stay in `$HOME`.
@@ -116,9 +117,9 @@ exactly what moves, and anything not listed below is yours to hand-edit freely.
 
 | Harness | Owned (set from `config/`, hand-edits overwritten) | Preserved |
 |---|---|---|
-| Claude | `skillOverrides`; the SessionStart + PreToolUse[Bash] determinism hooks; `mcp-servers.json` + user-scope MCP | every other settings key/hook |
-| Copilot | `disabledSkills`; the userPromptSubmitted + preToolUse hooks; `mcp-config.json` | everything else |
-| OpenCode | `opencode.json` keys `mcp`, `permission.skill`, `instructions` | every other key |
+| Claude | `CLAUDE.md`; `skillOverrides`; the SessionStart + PreToolUse[Bash] determinism hooks; `mcp-servers.json` + user-scope MCP | every other settings key/hook |
+| Copilot | `copilot-instructions.md`; `disabledSkills`; the userPromptSubmitted + preToolUse hooks; `mcp-config.json` | everything else |
+| OpenCode | `opencode.json` keys `mcp`, `permission.skill`, `instructions`; the rendered `~/.config/agentsync/opencode-instructions.md` | every other key |
 | VS Code | the instructions block, `chat.useCustomAgentHooks`, its `chat.hookFilesLocations` + a dedicated `vscode-hooks.json` | everything else |
 | Cursor | `mcpServers` in `~/.cursor/mcp.json` (global rules are settings-UI-only — no file to manage) | every other key |
 | Windsurf | `global_rules.md`; `mcpServers` in `mcp_config.json` | every other key |
@@ -191,7 +192,7 @@ concerns:
 
 | Concern | Claude Code | Copilot CLI | OpenCode | VS Code Copilot |
 |---|---|---|---|---|
-| Instructions | `~/.claude/CLAUDE.md` | `~/.copilot/copilot-instructions.md` | `opencode.json` ref | inlined in settings |
+| Instructions | `~/.claude/CLAUDE.md` | `~/.copilot/copilot-instructions.md` | `opencode.json` ref → rendered file | inlined in settings |
 | MCP servers | artifact + CLI import | `mcp-config.json` | `opencode.json` `mcp` | — (no surface) |
 | Skill tiers | `skillOverrides` (4-way) | `disabledSkills` | `permission.skill` | — |
 | Enforcement | hooks | hooks | JS plugin | own hooks file |
@@ -201,8 +202,21 @@ adapter declares it doesn't manage those (`capabilities()`) instead of faking it
 same applies to the file-based harnesses (Cursor, Windsurf, Zed, Cline): instructions
 and/or MCP where the tool has a real file surface, nothing faked where it doesn't.
 
-Need tool-specific instruction text? Add `config/instructions.<harness>.md` — it's
-appended to the shared instructions for that harness only.
+Instructions are **rendered**, never symlinked: every harness gets its own copy (a
+file, or an inline settings block), so an edit to `config/` reaches the tools on the
+next `agentsync apply`, and `verify` reports a stale copy as drift.
+
+- **Includes** — a line holding exactly `@include <path>` is replaced by that file's
+  text in every harness, user and project scope. The path is relative to the file
+  holding the directive and must stay inside the config dir. Keep a self-contained
+  block of rules (one employer, one client, one machine) in its own file, such as
+  `config/instructions/work.md`, and pull it in with one line: delete that line and
+  re-apply, and the block leaves every harness. The same text inside a fenced code
+  block, indented, or mid-sentence is not a directive. An included file cannot include
+  another; a nested, cyclic or missing target aborts every verb with `file:line`
+  before anything is written.
+- **Per-harness variants** — `config/instructions.<harness>.md` is appended to the
+  shared instructions for that harness only (it may use `@include` too).
 
 ### 2. The determinism protocol (the reference feature)
 

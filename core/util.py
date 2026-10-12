@@ -26,7 +26,7 @@ class Ctx:
     repo: Path          # this checkout (source of enforcement scripts)
     root: Path          # target root (default $HOME; a temp dir in tests)
     config: Path        # the config dir (holds instructions/skills/mcp/overrides + docs/)
-    instructions: Path  # rendered instructions markdown
+    instructions: Path  # shared instructions source (may hold @include lines)
     skills: dict        # skill name -> tier spec (string, or harness -> tier map)
     servers: dict       # MCP servers, single-source schema
     profile: dict       # harnesses + options
